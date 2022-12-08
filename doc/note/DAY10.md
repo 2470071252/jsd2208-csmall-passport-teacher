@@ -142,6 +142,47 @@ public class AdminMapperTests {
 }
 ```
 
+除了“插入管理员数据”以外，后续在处理业务时，还会有相关的检查，也需要在Mapper层有相应的功能，例如，用户名应该是唯一的，则需要“根据用户名查询/统计用户数据”的功能。
+
+则在`AdminMapper`接口中添加：
+
+```java
+int countByUsername(String username);
+```
+
+并在`AdminMapper.xml`中配置：
+
+```xml
+<select id="countByUsername" resultType="int">
+    SELECT count(*) FROM ams_admin WHERE username=#{username}
+</select>
+```
+
+完成后，在`AdminMapperTests`中编写并执行测试：
+
+```java
+
+```
+
+同理，管理员数据还设置了“手机号码”、“电子邮箱”这2个属性，也应该是唯一的，则再次添加抽象方法：
+
+```java
+int countByPhone(String phone);
+int countByEmail(String email);
+```
+
+并且，配置对应的XML映射：
+
+```xml
+
+```
+
+完成后，再次编写并执行测试：
+
+```java
+
+```
+
 
 
 

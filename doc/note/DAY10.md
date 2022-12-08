@@ -328,11 +328,81 @@ public class AdminMapperTests {
 }
 ```
 
+# 添加管理员--Service层
+
+将原项目（`csmall-product`）项目中的`ServiceCode`和`ServiceException`复制到当前项目对应的位置。
+
+在项目的根包下创建`pojo.dto.AdminAddNewDTO`类，在类中声明“添加管理员”时客户端应该提交的数据：
+
+```java
+@Data
+public class AdminAddNewDTO implements Serializable {
+    // username, password, nickname, avatar, phone, email, description, enable
+}
+```
+
+在项目的根包下创建`service.IAdminService`接口，并在接口中声明抽象方法：
+
+```java
+public interface IAdminService {
+    void addNew(AdminAddNewDTO adminAddNewDTO);
+}
+```
+
+在项目的根包下创建`service.impl.AdminServiceImpl`类，实现以上接口，添加`@Service`注解，并在类中声明并自动装配`AdminMapper`对象，然后，重写接口中定义的抽象方法：
+
+```java
+@Service
+public class AdminServiceImpl implements IAdminService {
+    
+    @Autowired
+    private AdminMapper adminMapper;
+    
+    public void addNew(AdminAddNewDTO adminAddNewDTO) {
+        // 从参数对象中取出用户名
+        String username = adminAddNewDTO.getUsername();
+        // 调用adminMapper.countByUsername()执行统计
+        int count = adminMapper.countByUsername(username);
+        // 判断统计结果是否大于0
+        if (count > 0) {
+            // 是：抛出异常（ERR_CONFLICT）
+            throw new ServiceException(ServiceCode.ERR_CONFLICT, "xxx");
+        }
+        
+        // 从参数对象中取出手机号码
+        // 调用adminMapper.countByPhone()执行统计
+        // 判断统计结果是否大于0
+        // 是：抛出异常（ERR_CONFLICT）
+        
+        // 从参数对象中取出电子邮箱
+        // 调用adminMapper.countByEmail()执行统计
+        // 判断统计结果是否大于0
+        // 是：抛出异常（ERR_CONFLICT）
+        
+        // 创建Admin对象
+        // 复制参数DTO对象中的属性到实体对象中
+        // TODO 将原密码加密，并修正属性值：admin.setPassword(xxx)
+        // 补全属性值：admin.setLoginCount(0)
+        // 调用adminMapper.insert()方法插入管理员数据
+    }
+}
+```
+
+完成后，在`src/test/java`下的根包下创建`service.AdminServiceTests`测试类，编写并执行测试：
+
+```java
+
+```
 
 
 
 
 
+
+
+```mysql
+update ams_admin set login_count=login_count+1 where id=?
+```
 
 
 

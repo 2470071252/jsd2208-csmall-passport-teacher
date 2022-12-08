@@ -10,10 +10,10 @@
             email, description, enable, last_login_ip, login_count,
             gmt_last_login
         ) VALUES (
-                     #{username}, #{password}, #{nickname}, #{avatar}, #{phone},
-                     #{email}, #{description}, #{enable}, #{lastLoginIp}, #{loginCount},
-                     #{gmtLastLogin}
-                 )
+            #{username}, #{password}, #{nickname}, #{avatar}, #{phone},
+            #{email}, #{description}, #{enable}, #{lastLoginIp}, #{loginCount},
+            #{gmtLastLogin}
+        )
     </insert>
 
     <!-- int countByUsername(String username); -->

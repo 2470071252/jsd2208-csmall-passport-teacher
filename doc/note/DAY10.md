@@ -171,7 +171,7 @@ int countByPhone(String phone);
 int countByEmail(String email);
 ```
 
-并且，配置对应的XML映射：
+并且，配置对应的XML映射，完成后，再次编写并执行测试。
 
 ```xml
 
@@ -179,9 +179,156 @@ int countByEmail(String email);
 
 完成后，再次编写并执行测试：
 
-```java
+全部完成后的代码如下：
 
+**AdminMapper.java**
+
+```java
+package cn.tedu.csmall.passport.mapper;
+
+import cn.tedu.csmall.passport.pojo.entity.Admin;
+import org.springframework.stereotype.Repository;
+
+/**
+ * 处理管理员数据的Mapper接口
+ *
+ * @author java@tedu.cn
+ * @version 0.0.1
+ */
+@Repository
+public interface AdminMapper {
+
+    /**
+     * 插入管理员数据
+     *
+     * @param admin 管理员数据
+     * @return 受影响的行数
+     */
+    int insert(Admin admin);
+
+    /**
+     * 根据用户名统计管理员的数量
+     *
+     * @param username 用户名
+     * @return 匹配用户名的管理员的数据
+     */
+    int countByUsername(String username);
+
+    /**
+     * 根据手机号码统计管理员的数量
+     *
+     * @param phone 手机号码
+     * @return 匹配手机号码的管理员的数据
+     */
+    int countByPhone(String phone);
+
+    /**
+     * 根据电子邮箱统计管理员的数量
+     *
+     * @param email 电子邮箱
+     * @return 匹配电子邮箱的管理员的数据
+     */
+    int countByEmail(String email);
+
+}
 ```
+
+**AdminMapper.xml**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.tedu.csmall.passport.mapper.AdminMapper">
+
+    <!-- int insert(Admin admin); -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ams_admin (
+            username, password, nickname, avatar, phone,
+            email, description, enable, last_login_ip, login_count,
+            gmt_last_login
+        ) VALUES (
+            #{username}, #{password}, #{nickname}, #{avatar}, #{phone},
+            #{email}, #{description}, #{enable}, #{lastLoginIp}, #{loginCount},
+            #{gmtLastLogin}
+        )
+    </insert>
+
+    <!-- int countByUsername(String username); -->
+    <select id="countByUsername" resultType="int">
+        SELECT count(*) FROM ams_admin WHERE username=#{username}
+    </select>
+
+    <!-- int countByPhone(String phone); -->
+    <select id="countByPhone" resultType="int">
+        SELECT count(*) FROM ams_admin WHERE phone=#{phone}
+    </select>
+
+    <!-- int countByEmail(String email); -->
+    <select id="countByEmail" resultType="int">
+        SELECT count(*) FROM ams_admin WHERE email=#{email}
+    </select>
+
+</mapper>
+```
+
+**AdminMapperTests.java**
+
+```java
+package cn.tedu.csmall.passport.mapper;
+
+import cn.tedu.csmall.passport.pojo.entity.Admin;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@Slf4j
+@SpringBootTest
+public class AdminMapperTests {
+
+    @Autowired
+    AdminMapper mapper;
+
+    @Test
+    void insert() {
+        Admin admin = new Admin();
+        admin.setUsername("wangkejing001");
+        admin.setPassword("123456");
+        admin.setPhone("13800138001");
+        admin.setEmail("wangkejing001@baidu.com");
+
+        log.debug("插入数据之前，参数：{}", admin);
+        int rows = mapper.insert(admin);
+        log.debug("插入数据完成，受影响的行数：{}", rows);
+        log.debug("插入数据之后，参数：{}", admin);
+    }
+
+    @Test
+    void countByUsername() {
+        String username = "wangkejing";
+        int count = mapper.countByUsername(username);
+        log.debug("根据用户名【{}】统计管理员账号的数量：{}", username, count);
+    }
+
+    @Test
+    void countByPhone() {
+        String phone = "13800138001";
+        int count = mapper.countByPhone(phone);
+        log.debug("根据手机号码【{}】统计管理员账号的数量：{}", phone, count);
+    }
+
+    @Test
+    void countByEmail() {
+        String email = "wangkejing@baidu.com";
+        int count = mapper.countByEmail(email);
+        log.debug("根据电子邮箱【{}】统计管理员账号的数量：{}", email, count);
+    }
+
+}
+```
+
+
 
 
 

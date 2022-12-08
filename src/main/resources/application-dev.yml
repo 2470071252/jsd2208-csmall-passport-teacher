@@ -1,0 +1,19 @@
+# ########################### #
+# 当前文件中的是【开发环境】的配置 #
+# ########################### #
+
+# Web服务端口
+server:
+  port: 9081
+
+# 连接数据库的配置
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/mall_ams?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Chongqing
+    username: root
+    password: root
+
+# 日志的显示级别
+logging:
+  level:
+    cn.tedu.csmall: trace

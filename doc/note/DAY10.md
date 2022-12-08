@@ -104,10 +104,42 @@ public class Admin implements Serializable {
 }
 ```
 
+然后，在根包下创建`mapper.AdminMapper`接口，并在接口中声明“插入管理员数据”的抽象方法：
 
+```java
+@Repository
+public interface AdminMapper {
+    
+    int insert(Admin admin);
+    
+}
+```
+
+然后，在`src/main/resources`下创建`mapper`文件夹（与配置文件中的配置对应），并通过复制粘贴得到`AdminMapper.xml`文件，在此文件中配置以上接口的抽象方法映射的SQL语句：
 
 ```xml
-#{username}
+<mapper namespace="接口的全限定名">
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    	SQL语句
+    </insert>
+</mapper>
+```
+
+完成后，在`src/test/java`下的根包下创建`mapper.AdminMapperTests`测试类，编写并执行测试：
+
+```java
+@SpringBootTest
+public class AdminMapperTests {
+    
+    @Autowired
+    AdminMapper mapper;
+    
+    @Test
+    void insert() {
+        // 测试代码
+    }
+    
+}
 ```
 
 

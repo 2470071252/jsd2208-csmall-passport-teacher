@@ -107,7 +107,7 @@ public class AdminServiceImpl implements IAdminService {
         }
 
         // 检查管理员数据的当前状态是否与参数enable表示的状态相同
-        if (queryResult.getEnable() == enable) {
+        if (queryResult.getEnable().equals(enable)) {
             String message = enableText[enable] + "管理员失败，当前管理员已经是"
                     + enableText[enable] + "状态！";
             log.warn(message);

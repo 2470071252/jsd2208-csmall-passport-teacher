@@ -6,13 +6,11 @@ import cn.tedu.csmall.passport.service.IAdminService;
 import cn.tedu.csmall.passport.web.JsonResult;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,6 +29,28 @@ public class AdminController {
     public JsonResult addNew(AdminAddNewDTO adminAddNewDTO) {
         log.debug("开始处理【添加管理员】的请求，参数：{}", adminAddNewDTO);
         adminService.addNew(adminAddNewDTO);
+        return JsonResult.ok();
+    }
+
+    // http://localhost:9081/admins/9527/enable
+    @ApiOperation("启用管理员")
+    @ApiOperationSupport(order = 310)
+    @ApiImplicitParam(name = "id", value = "管理员ID", required = true, dataType = "long")
+    @PostMapping("/{id:[0-9]+}/enable")
+    public JsonResult setEnable(@PathVariable Long id) {
+        log.debug("开始处理【启用管理员】的业务，参数：{}", id);
+        adminService.setEnable(id);
+        return JsonResult.ok();
+    }
+
+    // http://localhost:9081/admins/9527/disable
+    @ApiOperation("禁用管理员")
+    @ApiOperationSupport(order = 311)
+    @ApiImplicitParam(name = "id", value = "管理员ID", required = true, dataType = "long")
+    @PostMapping("/{id:[0-9]+}/disable")
+    public JsonResult setDisable(@PathVariable Long id) {
+        log.debug("开始处理【禁用管理员】的业务，参数：{}", id);
+        adminService.setDisable(id);
         return JsonResult.ok();
     }
 

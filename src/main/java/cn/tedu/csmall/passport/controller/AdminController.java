@@ -38,7 +38,7 @@ public class AdminController {
     @ApiImplicitParam(name = "id", value = "管理员ID", required = true, dataType = "long")
     @PostMapping("/{id:[0-9]+}/enable")
     public JsonResult setEnable(@PathVariable Long id) {
-        log.debug("开始处理【启用管理员】的业务，参数：{}", id);
+        log.debug("开始处理【启用管理员】的请求，参数：{}", id);
         adminService.setEnable(id);
         return JsonResult.ok();
     }
@@ -49,7 +49,7 @@ public class AdminController {
     @ApiImplicitParam(name = "id", value = "管理员ID", required = true, dataType = "long")
     @PostMapping("/{id:[0-9]+}/disable")
     public JsonResult setDisable(@PathVariable Long id) {
-        log.debug("开始处理【禁用管理员】的业务，参数：{}", id);
+        log.debug("开始处理【禁用管理员】的请求，参数：{}", id);
         adminService.setDisable(id);
         return JsonResult.ok();
     }

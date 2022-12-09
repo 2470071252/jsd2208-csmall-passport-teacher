@@ -97,7 +97,7 @@ public class AdminServiceImpl implements IAdminService {
 
     private void updateEnableById(Long id, Integer enable) {
         String[] enableText = {"禁用", "启用"};
-        log.debug("开始处理" + enableText[enable] + "管理员的业务，管理员ID：{}，目标状态：{}", id, enable);
+        log.debug("开始处理【" + enableText[enable] + "】管理员的业务，管理员ID：{}，目标状态：{}", id, enable);
         // 根据管理员id检查管理员数据是否存在
         AdminStandardVO queryResult = adminMapper.getStandardById(id);
         if (queryResult == null) {

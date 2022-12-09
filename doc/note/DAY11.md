@@ -192,6 +192,122 @@ public JsonResult addNew(AdminAddNewDTO adminAddNewDTO) {
 }
 ```
 
+# 显示管理员列表--Mapper层
+
+在项目的根包下创建`pojo.vo.AdminListItemVO`类：
+
+```java
+package cn.tedu.csmall.passport.pojo.vo;
+
+import lombok.Data;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+/**
+ * 管理员的列表项VO类
+ *
+ * @author java@tedu.cn
+ * @version 0.0.1
+ */
+@Data
+public class AdminListItemVO implements Serializable {
+
+    /**
+     * 数据id
+     */
+    private Long id;
+
+    /**
+     * 用户名
+     */
+    private String username;
+
+    /**
+     * 昵称
+     */
+    private String nickname;
+
+    /**
+     * 头像URL
+     */
+    private String avatar;
+
+    /**
+     * 手机号码
+     */
+    private String phone;
+
+    /**
+     * 电子邮箱
+     */
+    private String email;
+
+    /**
+     * 简介
+     */
+    private String description;
+
+    /**
+     * 是否启用，1=启用，0=未启用
+     */
+    private Integer enable;
+
+    /**
+     * 最后登录IP地址（冗余）
+     */
+    private String lastLoginIp;
+
+    /**
+     * 累计登录次数（冗余）
+     */
+    private Integer loginCount;
+
+    /**
+     * 最后登录时间（冗余）
+     */
+    private LocalDateTime gmtLastLogin;
+
+}
+```
+
+在`AdminMapper.java`接口中添加抽象方法，用于查询管理员列表：
+
+```java
+List<AdminListItemVO> list();
+```
+
+在`AdminMapper.xml`中配置：
+
+```xml
+<select id="list" resultMap="ListResultMap">
+	SELECT
+    	<include refid="ListQueryFields"/>
+    FROM
+    	ams_admin
+    ORDER BY 
+    	enable DESC, id
+</select>
+
+<sql id="ListQueryFields">
+    <if test="true">
+		id, username, …………
+    </if>
+</sql>
+
+<resultMap id="ListResultMap" type="xx.xx.xx.AdminListItemVO">
+    <id column="id" property="id"/>
+    <result column="username" property="username"/>
+    ... ...
+</resultMap>
+```
+
+在`AlbumMapperTests`中编写并执行测试：
+
+```java
+
+```
+
 
 
 

@@ -1,4 +1,4 @@
-package cn.tedu.csmall.passport.pojo.dto;
+package cn.tedu.csmall.passport.pojo.vo;
 
 import lombok.Data;
 
@@ -6,23 +6,23 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 添加管理员的DTO类
+ * 管理员的列表项VO类
  *
  * @author java@tedu.cn
  * @version 0.0.1
  */
 @Data
-public class AdminAddNewDTO implements Serializable {
+public class AdminListItemVO implements Serializable {
+
+    /**
+     * 数据id
+     */
+    private Long id;
 
     /**
      * 用户名
      */
     private String username;
-
-    /**
-     * 密码（原文）
-     */
-    private String password;
 
     /**
      * 昵称
@@ -45,7 +45,7 @@ public class AdminAddNewDTO implements Serializable {
     private String email;
 
     /**
-     * 描述
+     * 简介
      */
     private String description;
 
@@ -53,5 +53,20 @@ public class AdminAddNewDTO implements Serializable {
      * 是否启用，1=启用，0=未启用
      */
     private Integer enable;
+
+    /**
+     * 最后登录IP地址（冗余）
+     */
+    private String lastLoginIp;
+
+    /**
+     * 累计登录次数（冗余）
+     */
+    private Integer loginCount;
+
+    /**
+     * 最后登录时间（冗余）
+     */
+    private LocalDateTime gmtLastLogin;
 
 }

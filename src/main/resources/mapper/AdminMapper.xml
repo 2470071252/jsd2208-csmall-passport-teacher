@@ -16,6 +16,47 @@
         )
     </insert>
 
+    <!-- int update(Admin admin); -->
+    <update id="update">
+        UPDATE ams_admin
+        <set>
+            <if test="username != null">
+                username=#{username},
+            </if>
+            <if test="password != null">
+                password=#{password},
+            </if>
+            <if test="nickname != null">
+                nickname=#{nickname},
+            </if>
+            <if test="avatar != null">
+                avatar=#{avatar},
+            </if>
+            <if test="phone != null">
+                phone=#{phone},
+            </if>
+            <if test="email != null">
+                email=#{email},
+            </if>
+            <if test="description != null">
+                description=#{description},
+            </if>
+            <if test="enable != null">
+                enable=#{enable},
+            </if>
+            <if test="lastLoginIp != null">
+                last_login_ip=#{lastLoginIp},
+            </if>
+            <if test="loginCount != null">
+                login_count=#{loginCount},
+            </if>
+            <if test="gmtLastLogin != null">
+                gmt_last_login=#{gmtLastLogin},
+            </if>
+        </set>
+        WHERE id=#{id}
+    </update>
+
     <!-- int countByUsername(String username); -->
     <select id="countByUsername" resultType="int">
         SELECT count(*) FROM ams_admin WHERE username=#{username}
@@ -31,6 +72,16 @@
         SELECT count(*) FROM ams_admin WHERE email=#{email}
     </select>
 
+    <!-- AdminStandardVO getStandardById(Long id); -->
+    <select id="getStandardById" resultMap="StandardResultMap">
+        SELECT
+            <include refid="StandardQueryFields"/>
+        FROM
+            ams_admin
+        WHERE
+            id=#{id}
+    </select>
+
     <!-- List<AdminListItemVO> list(); -->
     <select id="list" resultMap="ListResultMap">
         SELECT
@@ -41,6 +92,14 @@
             id
     </select>
 
+    <sql id="StandardQueryFields">
+        <if test="true">
+            id, username, nickname, avatar, phone,
+            email, description, enable, last_login_ip, login_count,
+            gmt_last_login
+        </if>
+    </sql>
+
     <sql id="ListQueryFields">
         <if test="true">
             id, username, nickname, avatar, phone,
@@ -48,6 +107,20 @@
             gmt_last_login
         </if>
     </sql>
+
+    <resultMap id="StandardResultMap" type="cn.tedu.csmall.passport.pojo.vo.AdminStandardVO">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="nickname" property="nickname"/>
+        <result column="avatar" property="avatar"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="description" property="description"/>
+        <result column="enable" property="enable"/>
+        <result column="last_login_ip" property="lastLoginIp"/>
+        <result column="login_count" property="loginCount"/>
+        <result column="gmt_last_login" property="gmtLastLogin"/>
+    </resultMap>
 
     <resultMap id="ListResultMap" type="cn.tedu.csmall.passport.pojo.vo.AdminListItemVO">
         <id column="id" property="id"/>

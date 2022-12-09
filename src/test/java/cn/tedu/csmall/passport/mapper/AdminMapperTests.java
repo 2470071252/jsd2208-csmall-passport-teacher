@@ -30,6 +30,16 @@ public class AdminMapperTests {
     }
 
     @Test
+    void update() {
+        Admin admin = new Admin();
+        admin.setId(1L);
+        admin.setNickname("新-测试数据001");
+
+        int rows = mapper.update(admin);
+        log.debug("更新完成，受影响的行数：{}", rows);
+    }
+
+    @Test
     void countByUsername() {
         String username = "wangkejing";
         int count = mapper.countByUsername(username);
@@ -48,6 +58,13 @@ public class AdminMapperTests {
         String email = "wangkejing@baidu.com";
         int count = mapper.countByEmail(email);
         log.debug("根据电子邮箱【{}】统计管理员账号的数量：{}", email, count);
+    }
+
+    @Test
+    void getStandardById() {
+        Long id = 1L;
+        Object queryResult = mapper.getStandardById(id);
+        log.debug("根据id【{}】查询数据详情完成，查询结果：{}", id, queryResult);
     }
 
     @Test

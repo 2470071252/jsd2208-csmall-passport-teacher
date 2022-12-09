@@ -419,9 +419,38 @@ int update(Admin admin);
 
 ```
 
+# 启用或禁用管理员--Service层
 
+当前业务，可以设计成1个业务，例如：
 
+```java
+void updateEnableById(Long id, Integer enable);
+```
 
+也可以设计成2个业务，例如：
+
+```java
+void setEnable(Long id); // enable固定设置为1
+void setDisable(Long id); // enable固定设置为0
+```
+
+建议设计成2个业务，所以，在`IAdminService`中添加以上2个抽象方法。
+
+然后，需要在`AdminServiceImpl`中实现以上2个抽象方法，这2个方法的实现应该是高度类似的，可以在内部声明私有的方法完成公共的实现：
+
+```java
+private void updateEnableById(Long id, Integer enable) {
+    // 根据管理员id检查管理员数据是否存在
+    
+    // 检查管理员数据的当前状态是否与参数enable表示的状态相同
+    
+    // 创建Admin对象
+    // 将方法的2个参数封装到Admin对象中
+    // 调用AdminMapper对象的update()方法执行修改
+}
+```
+
+则需要在Mapper层补充“根据管理员id查询管理员详情”的功能！
 
 
 

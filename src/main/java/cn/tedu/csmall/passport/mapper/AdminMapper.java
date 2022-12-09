@@ -2,6 +2,7 @@ package cn.tedu.csmall.passport.mapper;
 
 import cn.tedu.csmall.passport.pojo.entity.Admin;
 import cn.tedu.csmall.passport.pojo.vo.AdminListItemVO;
+import cn.tedu.csmall.passport.pojo.vo.AdminStandardVO;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,6 +23,14 @@ public interface AdminMapper {
      * @return 受影响的行数
      */
     int insert(Admin admin);
+
+    /**
+     * 根据管理员id修改管理员的数据
+     *
+     * @param admin 封装了管理员id和新的数据的对象
+     * @return 受影响的行数
+     */
+    int update(Admin admin);
 
     /**
      * 根据用户名统计管理员的数量
@@ -46,6 +55,13 @@ public interface AdminMapper {
      * @return 匹配电子邮箱的管理员的数据
      */
     int countByEmail(String email);
+
+    /**
+     * 根据管理员id查询管理员详情
+     * @param id 管理员id
+     * @return 匹配的管理员详情，如果没有匹配的数据，则返回null
+     */
+    AdminStandardVO getStandardById(Long id);
 
     /**
      * 查询管理员列表

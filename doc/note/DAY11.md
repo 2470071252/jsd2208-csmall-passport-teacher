@@ -381,6 +381,44 @@ public JsonResult list() {
 
 完成后，重启项目，通过API文档的调试功能，可以查询到相册列表。
 
+# 启用或禁用管理员--Mapper层
+
+启用或禁用管理员的操作，本质上是修改管理员数据的`enable`属性的值，所以，是一种`UPDATE`操作。
+
+在Mapper层，每张表应该只需要1个`UPDATE`操作来实现这张表中任何值的修改。
+
+则在`AdminMapper.java`接口中添加抽象方法：
+
+```java
+int update(Admin admin);
+```
+
+然后，在`AdminMapper.xml`中配置：
+
+```xml
+<update id="update">
+	UPDATE ams_admin
+    <set>
+    	<if test="username != null">
+        	username=#{username},
+        </if>
+        <if test="password != null">
+        	password=#{password},
+        </if>
+        
+        ... ...
+        
+    </set>
+    WHERE id=#{id}
+</update>
+```
+
+完成后，在`AdminMapperTests.java`中编写并执行测试：
+
+```java
+
+```
+
 
 
 

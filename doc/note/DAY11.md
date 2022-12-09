@@ -280,37 +280,106 @@ List<AdminListItemVO> list();
 在`AdminMapper.xml`中配置：
 
 ```xml
+<!-- List<AdminListItemVO> list(); -->
 <select id="list" resultMap="ListResultMap">
-	SELECT
-    	<include refid="ListQueryFields"/>
+    SELECT
+        <include refid="ListQueryFields"/>
     FROM
-    	ams_admin
-    ORDER BY 
-    	enable DESC, id
+        ams_admin
+    ORDER BY
+        id
 </select>
 
 <sql id="ListQueryFields">
     <if test="true">
-		id, username, …………
+        id, username, nickname, avatar, phone,
+        email, description, enable, last_login_ip, login_count,
+        gmt_last_login
     </if>
 </sql>
 
-<resultMap id="ListResultMap" type="xx.xx.xx.AdminListItemVO">
+<resultMap id="ListResultMap" type="cn.tedu.csmall.passport.pojo.vo.AdminListItemVO">
     <id column="id" property="id"/>
     <result column="username" property="username"/>
-    ... ...
+    <result column="nickname" property="nickname"/>
+    <result column="avatar" property="avatar"/>
+    <result column="phone" property="phone"/>
+    <result column="email" property="email"/>
+    <result column="description" property="description"/>
+    <result column="enable" property="enable"/>
+    <result column="last_login_ip" property="lastLoginIp"/>
+    <result column="login_count" property="loginCount"/>
+    <result column="gmt_last_login" property="gmtLastLogin"/>
 </resultMap>
 ```
 
-在`AlbumMapperTests`中编写并执行测试：
+在`AdminMapperTests`中编写并执行测试：
 
 ```java
-
+@Test
+void list() {
+    List<?> list = mapper.list();
+    log.debug("查询列表完成，列表中的数据的数量：{}", list.size());
+    for (Object item : list) {
+        log.debug("{}", item);
+    }
+}
 ```
 
+# 显示管理员列表--Service层
 
+在`IAdminService`中添加抽象方法：
 
+```java
+/**
+ * 查询管理员列表
+ *
+ * @return 管理员列表
+ */
+List<AdminListItemVO> list();
+```
 
+在`AdminServiceImpl`中实现此方法：
+
+```java
+@Override
+public List<AdminListItemVO> list() {
+    log.debug("开始处理【查询管理员列表】的业务，参数：无");
+    List<AdminListItemVO> list = adminMapper.list();
+    return list;
+}
+```
+
+在`AdminServiceTests`中测试：
+
+```java
+@Test
+void list() {
+    List<?> list = service.list();
+    log.debug("查询列表完成，列表中的数据的数量：{}", list.size());
+    for (Object item : list) {
+        log.debug("{}", item);
+    }
+}
+```
+
+# 显示管理员列表--Controller层
+
+在`AdminController.java`中添加处理请求的方法：
+
+```java
+// http://localhost:9081/admins
+@ApiOperation("查询管理员列表")
+@ApiOperationSupport(order = 420)
+@GetMapping("")
+public JsonResult list() {
+    log.debug("开始处理【查询管理员列表】的请求，参数：无");
+    List<AdminListItemVO> list = adminService.list();
+    return JsonResult.ok(list);
+}
+```
+
+完成后，重启项目，通过API文档的调试功能，可以查询到相册列表。
 
 
 

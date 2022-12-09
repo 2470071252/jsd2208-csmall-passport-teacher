@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
 @Slf4j
 @SpringBootTest
 public class AdminMapperTests {
@@ -46,6 +48,15 @@ public class AdminMapperTests {
         String email = "wangkejing@baidu.com";
         int count = mapper.countByEmail(email);
         log.debug("根据电子邮箱【{}】统计管理员账号的数量：{}", email, count);
+    }
+
+    @Test
+    void list() {
+        List<?> list = mapper.list();
+        log.debug("查询列表完成，列表中的数据的数量：{}", list.size());
+        for (Object item : list) {
+            log.debug("{}", item);
+        }
     }
 
 }

@@ -31,4 +31,35 @@
         SELECT count(*) FROM ams_admin WHERE email=#{email}
     </select>
 
+    <!-- List<AdminListItemVO> list(); -->
+    <select id="list" resultMap="ListResultMap">
+        SELECT
+            <include refid="ListQueryFields"/>
+        FROM
+            ams_admin
+        ORDER BY
+            id
+    </select>
+
+    <sql id="ListQueryFields">
+        <if test="true">
+            id, username, nickname, avatar, phone,
+            email, description, enable, last_login_ip, login_count,
+            gmt_last_login
+        </if>
+    </sql>
+
+    <resultMap id="ListResultMap" type="cn.tedu.csmall.passport.pojo.vo.AdminListItemVO">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="nickname" property="nickname"/>
+        <result column="avatar" property="avatar"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="description" property="description"/>
+        <result column="enable" property="enable"/>
+        <result column="last_login_ip" property="lastLoginIp"/>
+        <result column="login_count" property="loginCount"/>
+        <result column="gmt_last_login" property="gmtLastLogin"/>
+    </resultMap>
 </mapper>

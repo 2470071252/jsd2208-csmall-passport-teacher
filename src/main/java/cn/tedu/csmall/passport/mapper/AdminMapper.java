@@ -1,7 +1,10 @@
 package cn.tedu.csmall.passport.mapper;
 
 import cn.tedu.csmall.passport.pojo.entity.Admin;
+import cn.tedu.csmall.passport.pojo.vo.AdminListItemVO;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * 处理管理员数据的Mapper接口
@@ -43,5 +46,12 @@ public interface AdminMapper {
      * @return 匹配电子邮箱的管理员的数据
      */
     int countByEmail(String email);
+
+    /**
+     * 查询管理员列表
+     *
+     * @return 管理员列表
+     */
+    List<AdminListItemVO> list();
 
 }

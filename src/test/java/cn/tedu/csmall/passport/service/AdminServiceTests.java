@@ -33,6 +33,18 @@ public class AdminServiceTests {
     }
 
     @Test
+    void delete() {
+        Long id = 2L;
+
+        try {
+            service.delete(id);
+            log.debug("删除管理员完成！");
+        } catch (ServiceException e) {
+            log.debug("删除管理员失败！具体原因请参见日志！");
+        }
+    }
+
+    @Test
     void setEnable() {
         Long id = 1L;
 

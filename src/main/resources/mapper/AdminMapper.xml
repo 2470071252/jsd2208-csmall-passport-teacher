@@ -16,6 +16,11 @@
         )
     </insert>
 
+    <!-- int deleteById(Long id); -->
+    <delete id="deleteById">
+        DELETE FROM ams_admin WHERE id=#{id}
+    </delete>
+
     <!-- int update(Admin admin); -->
     <update id="update">
         UPDATE ams_admin

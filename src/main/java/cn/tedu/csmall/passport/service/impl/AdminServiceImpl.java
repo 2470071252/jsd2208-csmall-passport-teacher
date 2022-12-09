@@ -79,6 +79,21 @@ public class AdminServiceImpl implements IAdminService {
     }
 
     @Override
+    public void delete(Long id) {
+        log.debug("开始处理【根据id删除删除管理员】的业务，参数：{}", id);
+        // 根据管理员id检查管理员数据是否存在
+        AdminStandardVO queryResult = adminMapper.getStandardById(id);
+        if (queryResult == null) {
+            String message = "删除管理员失败，尝试访问的数据不存在！";
+            log.warn(message);
+            throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+        }
+
+        log.debug("即将执行删除，参数：{}", id);
+        adminMapper.deleteById(id);
+    }
+
+    @Override
     public void setEnable(Long id) {
         updateEnableById(id, 1);
     }
@@ -97,7 +112,7 @@ public class AdminServiceImpl implements IAdminService {
 
     private void updateEnableById(Long id, Integer enable) {
         String[] enableText = {"禁用", "启用"};
-        log.debug("开始处理【" + enableText[enable] + "】管理员的业务，管理员ID：{}，目标状态：{}", id, enable);
+        log.debug("开始处理【" + enableText[enable] + "管理员】的业务，管理员ID：{}，目标状态：{}", id, enable);
         // 根据管理员id检查管理员数据是否存在
         AdminStandardVO queryResult = adminMapper.getStandardById(id);
         if (queryResult == null) {

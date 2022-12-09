@@ -25,6 +25,13 @@ public interface AdminMapper {
     int insert(Admin admin);
 
     /**
+     * 根据管理员id删除管理员数据
+     * @param id 管理员id
+     * @return 受影响的行数
+     */
+    int deleteById(Long id);
+
+    /**
      * 根据管理员id修改管理员的数据
      *
      * @param admin 封装了管理员id和新的数据的对象

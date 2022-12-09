@@ -32,6 +32,17 @@ public class AdminController {
         return JsonResult.ok();
     }
 
+    // http://localhost:9081/admins/9527/delete
+    @ApiOperation("根据id删除删除管理员")
+    @ApiOperationSupport(order = 200)
+    @ApiImplicitParam(name = "id", value = "管理员ID", required = true, dataType = "long")
+    @PostMapping("/{id:[0-9]+}/delete")
+    public JsonResult delete(@PathVariable Long id) {
+        log.debug("开始处理【根据id删除删除管理员】的请求，参数：{}", id);
+        adminService.delete(id);
+        return JsonResult.ok();
+    }
+
     // http://localhost:9081/admins/9527/enable
     @ApiOperation("启用管理员")
     @ApiOperationSupport(order = 310)

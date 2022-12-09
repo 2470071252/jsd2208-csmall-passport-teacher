@@ -30,6 +30,13 @@ public class AdminMapperTests {
     }
 
     @Test
+    void deleteById() {
+        Long id = 1L;
+        int rows = mapper.deleteById(id);
+        log.debug("删除完成，受影响的行数：{}", rows);
+    }
+
+    @Test
     void update() {
         Admin admin = new Admin();
         admin.setId(1L);

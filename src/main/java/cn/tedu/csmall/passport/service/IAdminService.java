@@ -9,7 +9,10 @@ public interface IAdminService {
 
     void addNew(AdminAddNewDTO adminAddNewDTO);
 
+    void delete(Long id);
+
     void setEnable(Long id);
+
     void setDisable(Long id);
 
     /**

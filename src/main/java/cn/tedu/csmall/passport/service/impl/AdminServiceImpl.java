@@ -5,6 +5,7 @@ import cn.tedu.csmall.passport.mapper.AdminMapper;
 import cn.tedu.csmall.passport.pojo.dto.AdminAddNewDTO;
 import cn.tedu.csmall.passport.pojo.entity.Admin;
 import cn.tedu.csmall.passport.pojo.vo.AdminListItemVO;
+import cn.tedu.csmall.passport.pojo.vo.AdminStandardVO;
 import cn.tedu.csmall.passport.service.IAdminService;
 import cn.tedu.csmall.passport.web.ServiceCode;
 import lombok.extern.slf4j.Slf4j;
@@ -78,10 +79,49 @@ public class AdminServiceImpl implements IAdminService {
     }
 
     @Override
+    public void setEnable(Long id) {
+        updateEnableById(id, 1);
+    }
+
+    @Override
+    public void setDisable(Long id) {
+        updateEnableById(id, 0);
+    }
+
+    @Override
     public List<AdminListItemVO> list() {
         log.debug("开始处理【查询管理员列表】的业务，参数：无");
         List<AdminListItemVO> list = adminMapper.list();
         return list;
+    }
+
+    private void updateEnableById(Long id, Integer enable) {
+        String[] enableText = {"禁用", "启用"};
+        log.debug("开始处理" + enableText[enable] + "管理员的业务，管理员ID：{}，目标状态：{}", id, enable);
+        // 根据管理员id检查管理员数据是否存在
+        AdminStandardVO queryResult = adminMapper.getStandardById(id);
+        if (queryResult == null) {
+            String message = enableText[enable] + "管理员失败，尝试访问的数据不存在！";
+            log.warn(message);
+            throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+        }
+
+        // 检查管理员数据的当前状态是否与参数enable表示的状态相同
+        if (queryResult.getEnable() == enable) {
+            String message = enableText[enable] + "管理员失败，当前管理员已经是"
+                    + enableText[enable] + "状态！";
+            log.warn(message);
+            throw new ServiceException(ServiceCode.ERR_CONFLICT, message);
+        }
+
+        // 创建Admin对象
+        Admin admin = new Admin();
+        // 将方法的2个参数封装到Admin对象中
+        admin.setId(id);
+        admin.setEnable(enable);
+        // 调用AdminMapper对象的update()方法执行修改
+        log.debug("即将修改数据，参数：{}", admin);
+        adminMapper.update(admin);
     }
 
 }

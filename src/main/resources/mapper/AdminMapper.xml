@@ -16,9 +16,34 @@
         )
     </insert>
 
+    <!-- int insertBatch(List<Admin> adminList); -->
+    <insert id="insertBatch" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ams_admin (
+            username, password, nickname, avatar, phone,
+            email, description, enable, last_login_ip, login_count,
+            gmt_last_login
+        ) VALUES
+        <foreach collection="list" item="admin" separator=",">
+            (
+            #{admin.username}, #{admin.password}, #{admin.nickname}, #{admin.avatar}, #{admin.phone},
+            #{admin.email}, #{admin.description}, #{admin.enable}, #{admin.lastLoginIp}, #{admin.loginCount},
+            #{admin.gmtLastLogin}
+            )
+        </foreach>
+    </insert>
+
     <!-- int deleteById(Long id); -->
     <delete id="deleteById">
         DELETE FROM ams_admin WHERE id=#{id}
+    </delete>
+
+    <!-- int deleteByIds(Long[] ids); -->
+    <delete id="deleteByIds">
+        DELETE FROM ams_admin WHERE id IN (
+        <foreach collection="array" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
     </delete>
 
     <!-- int update(Admin admin); -->
@@ -61,6 +86,11 @@
         </set>
         WHERE id=#{id}
     </update>
+
+    <!-- int count(); -->
+    <select id="count" resultType="int">
+        SELECT count(*) FROM ams_admin
+    </select>
 
     <!-- int countByUsername(String username); -->
     <select id="countByUsername" resultType="int">

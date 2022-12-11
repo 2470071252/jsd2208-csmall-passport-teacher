@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -30,10 +31,30 @@ public class AdminMapperTests {
     }
 
     @Test
+    void insertBatch() {
+        List<Admin> admins = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            Admin admin = new Admin();
+            admin.setUsername("test-admin-" + i);
+            admins.add(admin);
+        }
+
+        int rows = mapper.insertBatch(admins);
+        log.debug("批量插入完成，受影响的行数：{}", rows);
+    }
+
+    @Test
     void deleteById() {
         Long id = 1L;
         int rows = mapper.deleteById(id);
         log.debug("删除完成，受影响的行数：{}", rows);
+    }
+
+    @Test
+    void deleteByIds() {
+        Long[] ids = {1L, 3L, 5L};
+        int rows = mapper.deleteByIds(ids);
+        log.debug("批量删除完成，受影响的行数：{}", rows);
     }
 
     @Test
@@ -44,6 +65,12 @@ public class AdminMapperTests {
 
         int rows = mapper.update(admin);
         log.debug("更新完成，受影响的行数：{}", rows);
+    }
+
+    @Test
+    void count() {
+        int count = mapper.count();
+        log.debug("统计完成，表中的数据的数量：{}", count);
     }
 
     @Test

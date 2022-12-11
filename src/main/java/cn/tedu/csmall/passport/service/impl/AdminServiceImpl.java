@@ -15,6 +15,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * 处理管理员数据的业务实现类
+ *
+ * @author java@tedu.cn
+ * @version 0.0.1
+ */
 @Slf4j
 @Service
 public class AdminServiceImpl implements IAdminService {
@@ -81,15 +87,16 @@ public class AdminServiceImpl implements IAdminService {
     @Override
     public void delete(Long id) {
         log.debug("开始处理【根据id删除删除管理员】的业务，参数：{}", id);
-        // 根据管理员id检查管理员数据是否存在
-        AdminStandardVO queryResult = adminMapper.getStandardById(id);
+        // 检查尝试删除的数据是否存在
+        Object queryResult = adminMapper.getStandardById(id);
         if (queryResult == null) {
             String message = "删除管理员失败，尝试访问的数据不存在！";
             log.warn(message);
             throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
         }
 
-        log.debug("即将执行删除，参数：{}", id);
+        // 执行删除
+        log.debug("即将执行删除数据，参数：{}", id);
         adminMapper.deleteById(id);
     }
 
@@ -112,8 +119,8 @@ public class AdminServiceImpl implements IAdminService {
 
     private void updateEnableById(Long id, Integer enable) {
         String[] enableText = {"禁用", "启用"};
-        log.debug("开始处理【" + enableText[enable] + "管理员】的业务，管理员ID：{}，目标状态：{}", id, enable);
-        // 根据管理员id检查管理员数据是否存在
+        log.debug("开始处理【{}管理员】的业务，ID：{}，目标状态：{}", enableText[enable], id, enable);
+        // 检查数据是否存在
         AdminStandardVO queryResult = adminMapper.getStandardById(id);
         if (queryResult == null) {
             String message = enableText[enable] + "管理员失败，尝试访问的数据不存在！";
@@ -121,20 +128,18 @@ public class AdminServiceImpl implements IAdminService {
             throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
         }
 
-        // 检查管理员数据的当前状态是否与参数enable表示的状态相同
+        // 检查当前状态是否与参数表示的状态相同
         if (queryResult.getEnable().equals(enable)) {
-            String message = enableText[enable] + "管理员失败，当前管理员已经是"
+            String message = enableText[enable] + "管理员失败，当前管理员已经处于"
                     + enableText[enable] + "状态！";
             log.warn(message);
             throw new ServiceException(ServiceCode.ERR_CONFLICT, message);
         }
 
-        // 创建Admin对象
+        // 准备执行更新
         Admin admin = new Admin();
-        // 将方法的2个参数封装到Admin对象中
         admin.setId(id);
         admin.setEnable(enable);
-        // 调用AdminMapper对象的update()方法执行修改
         log.debug("即将修改数据，参数：{}", admin);
         adminMapper.update(admin);
     }

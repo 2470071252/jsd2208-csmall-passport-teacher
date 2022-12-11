@@ -1,4 +1,4 @@
-# 添加管理员--Service层（续）
+# 54. 添加管理员--Service层（续）
 
 **关于Service层的相关代码：**
 
@@ -162,7 +162,7 @@
   }
   ```
 
-# 添加管理员--Controller层
+# 55. 添加管理员--Controller层
 
 从前序项目中复制`JsonResult`、`GlobalExceptionHandler`到当前项目对应的位置。
 
@@ -192,7 +192,7 @@ public JsonResult addNew(AdminAddNewDTO adminAddNewDTO) {
 }
 ```
 
-# 显示管理员列表--Mapper层
+# 56. 显示管理员列表--Mapper层
 
 在项目的根包下创建`pojo.vo.AdminListItemVO`类：
 
@@ -326,7 +326,7 @@ void list() {
 }
 ```
 
-# 显示管理员列表--Service层
+# 57. 显示管理员列表--Service层
 
 在`IAdminService`中添加抽象方法：
 
@@ -363,7 +363,7 @@ void list() {
 }
 ```
 
-# 显示管理员列表--Controller层
+# 58. 显示管理员列表--Controller层
 
 在`AdminController.java`中添加处理请求的方法：
 
@@ -381,7 +381,7 @@ public JsonResult list() {
 
 完成后，重启项目，通过API文档的调试功能，可以查询到相册列表。
 
-# 启用或禁用管理员--Mapper层
+# 59. 启用或禁用管理员--Mapper层
 
 启用或禁用管理员的操作，本质上是修改管理员数据的`enable`属性的值，所以，是一种`UPDATE`操作。
 
@@ -419,7 +419,7 @@ int update(Admin admin);
 
 ```
 
-# 启用或禁用管理员--Service层
+# 60. 启用或禁用管理员--Service层
 
 当前业务，可以设计成1个业务，例如：
 

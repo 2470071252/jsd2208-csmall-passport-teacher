@@ -14,6 +14,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 处理管理员相关请求的控制器
+ *
+ * @author java@tedu.cn
+ * @version 0.0.1
+ */
 @Slf4j
 @RestController
 @RequestMapping("/admins")
@@ -23,6 +29,7 @@ public class AdminController {
     @Autowired
     private IAdminService adminService;
 
+    // http://localhost:9081/admins/add-new
     @ApiOperation("添加管理员")
     @ApiOperationSupport(order = 100)
     @PostMapping("/add-new")

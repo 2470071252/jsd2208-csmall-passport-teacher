@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.tedu.csmall.passport.mapper.AdminRoleMapper">
+
+    <!-- int insertBatch(AdminRole[] adminRoleList); -->
+    <insert id="insertBatch" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ams_admin_role (
+            admin_id, role_id, gmt_create, gmt_modified
+        ) VALUES
+        <foreach collection="array" item="adminRole" separator=",">
+        (
+            #{adminRole.adminId}, #{adminRole.roleId}, #{adminRole.gmtCreate}, #{adminRole.gmtModified}
+        )
+        </foreach>
+    </insert>
+
+    <!-- int deleteByAdminId(Long adminId); -->
+    <delete id="deleteByAdminId">
+        DELETE FROM ams_admin_role WHERE admin_id=#{adminId}
+    </delete>
+
+</mapper>

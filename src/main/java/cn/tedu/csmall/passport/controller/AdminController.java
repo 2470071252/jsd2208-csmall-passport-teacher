@@ -29,6 +29,10 @@ public class AdminController {
     @Autowired
     private IAdminService adminService;
 
+    public AdminController() {
+        log.debug("创建控制器对象：AdminController");
+    }
+
     // http://localhost:9081/admins/add-new
     @ApiOperation("添加管理员")
     @ApiOperationSupport(order = 100)

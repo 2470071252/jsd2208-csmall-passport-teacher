@@ -28,6 +28,10 @@ public class AdminServiceImpl implements IAdminService {
     @Autowired
     private AdminMapper adminMapper;
 
+    public AdminServiceImpl() {
+        log.debug("创建业务对象：AdminServiceImpl");
+    }
+
     @Override
     public void addNew(AdminAddNewDTO adminAddNewDTO) {
         log.debug("开始处理【添加管理员】的业务，参数：{}", adminAddNewDTO);

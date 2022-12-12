@@ -27,12 +27,16 @@ import java.util.List;
 @Api(tags = "管理员管理模块")
 public class AdminController {
 
-    @Autowired
-    @Qualifier("adminServiceImpl2")
+    // @Autowired
     private IAdminService adminService;
 
-    public AdminController() {
-        log.debug("创建控制器对象：AdminController");
+//    public AdminController() {
+//        log.debug("创建控制器对象：AdminController");
+//    }
+
+    public AdminController(IAdminService adminService) {
+        log.debug("创建控制器对象：AdminController，构造方法传入参数：{}", adminService);
+        this.adminService = adminService;
     }
 
     // http://localhost:9081/admins/add-new

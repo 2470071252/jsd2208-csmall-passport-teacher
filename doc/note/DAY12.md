@@ -342,22 +342,38 @@ Spring Boot框架主要解决了依赖管理、自动配置的相关问题。
 
 在没有Spring Boot框架之前，每创建一个新的项目，或添加新的依赖，可能都需要做大量的配置，而各个不同的项目中，使用相同的依赖时，需要编写的配置可能是高度相似，甚至完全相同的！Spring Boot希望它是“**开箱即用**的（Out Of Box）”，它自动的处理掉了许多可预测的配置，同时，它是希望遵循“**约定大于配置**”的思想的，即：各开发者不必关心Spring Boot是如何配置的，只需要知道Spring Boot把哪些配置项配置成什么值即可，然后，开发者只需要按照这些配置值的“约定”去写代码就行！例如，Spring Boot将组件扫描的包配置为启用类所在的包，开发者只需要将各组件类声明在此包或其子孙包下即可，根本不需要关心Spring Boot在哪里或通过什么方式配置了组件扫描！
 
-## Spring框架的依赖项
+## Spring Boot框架的依赖项
 
-当在项目中需要使用Spring框架时，需要添加`spring-context`依赖项，例如：
+当在项目中需要使用Spring Boot框架时，需要添加`spring-boot-starter`基础依赖项，例如：
 
 ```xml
-<!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
+<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
 <dependency>
-    <groupId>org.springframework</groupId>
-    <artifactId>spring-context</artifactId>
-    <version>5.3.20</version>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <version>2.5.9</version>
 </dependency>
 ```
 
-当然
+## Spring Boot的典型特征
 
-
+- 任何以`spring-boot-starter`作为前缀的依赖项（例如`spring-boot-starter-test`、`spring-boot-starter-web`等），都使用`spring-boot-starter`作为基础依赖项
+- 在`spring-boot-starter`中，包含了SLF4j日志框架的依赖项，所以，任何一个Spring Boot项目，都可以直接使用SLF4j日志框架
+- Spring Boot项目默认创建了`src/main/resources/application.properties`配置文件，并且在启用项目时，自动读取此配置文件，所以，在此配置文件中的配置是默认读取的
+- Spring Boot指定了一系列特定名称的配置属性，例如`spring.datasource.url`、`server.port`等，按照这些名称编写的配置，会被自动应用
+- Spring Boot支持Profile配置，任何以`application-自定义名称.properties`作为文件名的配置文件，都会被视为Profile配置，例如`application-dev.properties`、`application-dev-jack.properties`等
+- 在`spring-boot-starter`中，包含了`snakeyaml`工具包，可以解析YAML语法的配置，所以，在Spring Boot项目中，可以使用`.yml`作为扩展名的配置文件，取代`.properties`配置文件
+- Spring Boot项目的启用类上添加了`@SpringBootApplication`注解，每个项目中只能有1个类添加此注解
+- 启用类上的`@SpringBootApplication`注解还使用了`@SpringBootConfiguration`作为元注解，且`@SpringBootConfiguration`使用`@Configuration`作为元注解，所以，启动类本身也是一个配置类
+- 启用类上的`@SpringBootApplication`注解还使用了`@ComponentScan`作为元注解，且没有配置组件的包，所以，默认执行组件扫描时，会扫描启用类所在的包
+- 在`src/test/java`下编写的测试类，当需要加载项目的各种配置和Spring环境时，需要在测试类上添加`@SpringBootTest`注解，且这样的测试类所在的包，与`src/main/java`下的组件扫描的包必须是一致的
+- 当添加了数据库编程的相关依赖项时（例如`spring-boot-starter-jdbc`，或包括此依赖项的其它依赖，例如`mybatis-spring-boot-starter`中就包含了`spring-boot-starter-jdbc`），启用项目时，Spring Boot会自动读取连接数据库的配置（即从配置文件中读取`spring.datasource.url`属性的值），如果在配置文件中并未配置此属性，或此属性的值不是以`jdbc:`开头的，会导致项目启动失败
+- 当添加了数据库编程的相关依赖项时，会自动配置`DataSource`对象
+- 当添加了`spring-boot-starter-web`依赖项后，此依赖项中包含一个嵌入式的Tomcat，当启用项目时，会自动将当前项目部署到此Tomcat上并启用Tomcat，默认占用`8080`端口，可通过配置文件中的`server.port`属性修改端口号
+- 在Spring MVC项目中，当需要响应JSON格式的正文时，需要添加`jackson-databind`依赖，在`spring-boot-starter-web`中也包含了依赖，所以，在基于Spring Boot的Web开发中，可以直接响应JSON格式的正文
+- 当添加了`spring-boot-starter-web`依赖项后，会将`src/main/resources/static`配置为默认的静态资源文件夹，如果需要允许访问静态资源，将相关文件放在此文件夹中即可
+  - 在创建项目时勾选了`Web`选项，会自动创建此`static`文件夹，如果未勾选，只要添加了依赖项，可自行创建此文件夹
+  - 另外还有`src/main/resources/templates`文件夹也可作为静态资源文件夹，但不推荐，此文件夹应该是用于存放模板视图文件的（非前后端分离项目才需要使用）
 
 
 

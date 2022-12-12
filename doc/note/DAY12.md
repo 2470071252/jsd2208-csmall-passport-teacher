@@ -56,7 +56,7 @@ Spring框架主要解决了创建对象、管理对象的相关问题。
 - `@ControllerAdvice`
 - `@RestControllerAdvice`
 
-# 通过Spring框架创建对象--@Bean方法
+## 通过Spring框架创建对象--@Bean方法
 
 在配置类中，可以自定义某个方法，此方法可以返回某个对象，然后，在方法上添加`@Bean`注解，则Spring加载此配置类时，就会自动执行此方法，从而实现创建对象的效果！
 
@@ -198,6 +198,123 @@ public class AdminController {
   - 通过Setter方法注入值，即在Setter方法添加`@Autowired`注解
   - 通过构造方法注入值
 - 请记住Spring框架调用构造方法的机制
+
+## 关于IoC与DI
+
+**IoC**：**I**nversion **o**f **C**ontrol，即**控制反转**，即：将对象的控制权交给框架
+
+**DI**：**D**ependency **I**njection，即**依赖注入**，即：为对象的依赖项注入值，通常表现为自动装配
+
+Spring通过DI完善了IoC。
+
+## 其它
+
+Spring最核心的内容，主要分为：Spring IoC、Spring AOP，其中，Spring AOP会在本阶段末期再讲。
+
+# Spring MVC
+
+## Spring MVC框架的作用
+
+Spring MVC框架主要解决了接收请求、响应结果的相关问题（其实，并没有关注MVC中的M）。
+
+> 提示：**MVC** = **M**odel + **V**iew + **C**ontroller，这是主流的开发项目的思想，它认为每个项目至少需要有这3个部分，才是一个完整的项目，其中，Controller是控制器，用于接收请求、响应结果，View是视图，早些年在不是前后端分离的项目中，服务器端在处理完请求后，应该向客户端响应某个页面，此页面就是视图，目前，主流的设计方案是前后端分离的，则服务器端不需要也不会处理视图，Model是数据模型，是一套相对固定的数据处理流程，在项目中表现为Service与Mapper。
+
+## Spring MVC框架的依赖项
+
+当在项目中需要使用Spring框架时，需要添加`spring-webmvc`依赖项，例如：
+
+```xml
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-webmvc</artifactId>
+    <version>5.3.20</version>
+</dependency>
+```
+
+## 关于控制器
+
+在Spring MVC框架中，添加了`@Controller`注解的类，才算是控制器类！例如：
+
+```java
+@Controller
+public class AdminController {
+}
+```
+
+在控制器类中，可以添加处理请求的方法，并在方法上添加`@RequestMapping`系列注解来配置请求路径，例如：
+
+```java
+@Controller
+public class AdminController {
+    @PostMapping("/delete")
+    public String delete() {
+        // 暂不关心方法体
+    }
+}
+```
+
+以上代码处理请求之后，将返回一个`String`类型的结果（以上方法的返回值是`String`），这个返回值表示的是“视图组件的名称”，接下来，会由Spring MVC框架的其它组件根据这个视图名称找到对应的视图组件（例如某个html页面），最后，会将此视图组件响应到客户端去！
+
+在前后端分离的做法中，服务器端并不会处理视图，当处理完某个请求后，向客户端响应必要的数据即可，至于这些数据如何呈现出来，应该是由客户端软件负责的！
+
+在处理请求的方法上添加`@ResponseBody`，则此方法的返回值就不再是视图组件的名称，而是要响应到客户端的数据！所以，此注解也称之为“响应正文”的注解，例如：
+
+```java
+@Controller
+public class AdminController {
+    @PostMapping("/delete")
+    @ResponseBody
+    public String delete() {
+        // 暂不关心方法体
+    }
+}
+```
+
+另外，也可以将此注解添加在控制器类上，则默认情况下，此类中所有处理请求的方法都将响应正文！例如：
+
+```java
+@Controller
+@ResponseBody
+public class AdminController {
+    @PostMapping("/delete")
+    public String delete() {
+        // 暂不关心方法体
+    }
+}
+```
+
+为了便于使用，Spring MVC框架还提供了`@RestController`注解，它使用了`@Controller`和`@ResponseBody`作为元注解，所以，同时具有这2个注解的效果，例如：
+
+```java
+// @Controller    // 不再需要
+// @ResponseBody  // 不再需要
+@RestController   // 同时具有@Controller和@ResponseBody的效果
+public class AdminController {
+    @PostMapping("/delete")
+    public String delete() {
+        // 暂不关心方法体
+    }
+}
+```
+
+其源代码为：
+
+```java
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Controller
+@ResponseBody
+public @interface RestController {
+    @AliasFor(
+        annotation = Controller.class
+    )
+    String value() default "";
+}
+```
+
+与此类似的还有`@RestControllerAdvice`，同时具有`@ControllerAdvice`和`@ResponseBody`的效果。
 
 
 

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -27,14 +28,22 @@ import java.util.List;
 @Api(tags = "管理员管理模块")
 public class AdminController {
 
+    @Resource
     // @Autowired
     private IAdminService adminService;
 
-//    public AdminController() {
+    @Autowired
+    public void setAdminService(IAdminService adminService) {
+        System.out.println("AdminController.setAdminService");
+        this.adminService = adminService;
+    }
+
+    //    public AdminController() {
 //        log.debug("创建控制器对象：AdminController");
 //    }
-
-    public AdminController(IAdminService adminService) {
+//
+    @Autowired
+    public AdminController(@Qualifier("adminServiceImpl") IAdminService adminService) {
         log.debug("创建控制器对象：AdminController，构造方法传入参数：{}", adminService);
         this.adminService = adminService;
     }

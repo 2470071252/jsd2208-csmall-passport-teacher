@@ -168,10 +168,36 @@ public class AdminController {
 
 - 如果类中仅有1个构造方法，无论它是无参数的，还是有参数的，Spring都会尝试调用它，如果是有参数，Spring会自动通过自动装配机制为此参数赋值
 - 如果类中存在无参数的构造方法，无论还有没有其它构造方法，默认情况下，Spring都会自动调用无参数的构造方法
+- 如果类中存在多个构造方法，当希望Spring调用特定的某个构造方法时，可以在此构造方法上添加`@Autowired`注解
 
+另外，也可以在Setter方法上添加`@Autowired`注解，Spring也会自动调用它们，也能实现自动装配参数的值，从而为属性赋值的效果，例如：
 
+```java
+@RestController
+public class AdminController {
 
+    private IAdminService adminService;
 
+    @Autowired // 添加注解，Spring会自动调用此方法，为参数自动装配值
+    public void setAdminService(IAdminService adminService) {
+        this.adminService = adminService;
+    }
+    
+}
+```
+
+以上为属性自动装配的做法，也适用于`@Bean`方法。
+
+【小结】
+
+- 自动装配表现为：为属性赋值、为方法的参数赋值（需要方法是被Spring自动调用的）
+- 自动装配的注解：`@Resource`、`@Autowired`，请记住它们的装配机制
+- 当被自动装配的属性或参数在Spring容器中存在多个类型匹配的值时，可以组合使用`@Autowired`和`@Qualifier`
+- 当属性需要被自动装配值时，可以有3种方法：
+  - 在属性上添加`@Autowired`注解
+  - 通过Setter方法注入值，即在Setter方法添加`@Autowired`注解
+  - 通过构造方法注入值
+- 请记住Spring框架调用构造方法的机制
 
 
 

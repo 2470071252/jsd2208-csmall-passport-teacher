@@ -316,21 +316,54 @@ public @interface RestController {
 
 与此类似的还有`@RestControllerAdvice`，同时具有`@ControllerAdvice`和`@ResponseBody`的效果。
 
+## Spring MVC框架的相关注解
 
+- `@RequestMapping`：可以添加在控制器类上，也可以添加在处理请求的方法上，主要用于配置请求路径，还可以配置其它与请求相关的设置，例如通过此注解的`method`属性来限制请求方式
+- `@PostMapping`：添加在处理请求的方法上，主要用于配置请求路径，及其它与请求相关的参数，是将请求方式限制为`POST`的`@RequestMapping`
+- `@GetMapping`：与`@PostMapping`类似，区别在于限制请求方式为`GET`
+- `@PutMapping`：与`@PostMapping`类似，区别在于限制请求方式为`PUT`
+- `@DeleteMapping`：与`@PostMapping`类似，区别在于限制请求方式为`DELETE`
+- `@RequestParam`：添加在处理请求的方法的参数上，用于：配置请求参数的名称、要求必须提交此参数（不允许为`null`）、设置请求参数的默认值（不提交时视为某值）
+- `@PathVariable`：添加在处理请求的方法的参数上，当设计URL时使用了占位符，则必须在方法的参数上通过此注解来获取占位符对应的值
+- `@RequestBody`：添加在处理请求的方法的POJO类型的参数上，添加此注解后，客户端提交的请求参数必须是对象格式的，如果未添加此注解，客户端提交的请求参数必须是FormData格式的
+- `@ResponseBody`：参考前节说明
+- `@RestController`：参考前节说明
+- `@ExceptionHandler`：添加在处理异常的方法上
+- `@ControllerAdvice`：添加在某个类上，则此类中特定的方法（例如处理异常的方法）将作用于整个项目每次处理请求的过程中
+- `@RestControllerAdvice`：参考前节说明
 
+# Spring Boot
 
+## Spring Boot框架的作用
 
+Spring Boot框架主要解决了依赖管理、自动配置的相关问题。
 
+在开发实践中，需要使用到的依赖项（框架、各种工具，等等）比较多，如果依赖项A依赖于B，依赖项C也依赖于B，但是，它们依赖的依赖项B的版本却不同，则无法正常使用！Spring Boot提供了一系列的`spring-boot-starter-???`依赖项，这些依赖项中都包括了主流的相关依赖项，以`spring-boot-starter-web`为例，其中就包含了Spring MVC框架的核心依赖项`spring-webmvc`，也包含了响应JSON时需要使用到的`jackson-databind`，等等，并且，管理了这些依赖项的版本，以至于各个开发者只需要添加`spring-boot-starter-web`即可，由Spring Boot来决定其依赖的`spring-webmvc`、`jackson-databind`等依赖项的版本，并保证是兼容可用的！
 
+在没有Spring Boot框架之前，每创建一个新的项目，或添加新的依赖，可能都需要做大量的配置，而各个不同的项目中，使用相同的依赖时，需要编写的配置可能是高度相似，甚至完全相同的！Spring Boot希望它是“**开箱即用**的（Out Of Box）”，它自动的处理掉了许多可预测的配置，同时，它是希望遵循“**约定大于配置**”的思想的，即：各开发者不必关心Spring Boot是如何配置的，只需要知道Spring Boot把哪些配置项配置成什么值即可，然后，开发者只需要按照这些配置值的“约定”去写代码就行！例如，Spring Boot将组件扫描的包配置为启用类所在的包，开发者只需要将各组件类声明在此包或其子孙包下即可，根本不需要关心Spring Boot在哪里或通过什么方式配置了组件扫描！
 
+## Spring框架的依赖项
 
+当在项目中需要使用Spring框架时，需要添加`spring-context`依赖项，例如：
 
-
-
-
-
-
-```java
-static
+```xml
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-context</artifactId>
+    <version>5.3.20</version>
+</dependency>
 ```
+
+当然
+
+
+
+
+
+
+
+
+
+
 

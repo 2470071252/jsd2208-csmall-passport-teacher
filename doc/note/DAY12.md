@@ -56,6 +56,60 @@ Spring框架主要解决了创建对象、管理对象的相关问题。
 - `@ControllerAdvice`
 - `@RestControllerAdvice`
 
+# 通过Spring框架创建对象--@Bean方法
+
+在配置类中，可以自定义某个方法，此方法可以返回某个对象，然后，在方法上添加`@Bean`注解，则Spring加载此配置类时，就会自动执行此方法，从而实现创建对象的效果！
+
+例如：
+
+```java
+@Configuration
+public class XxxConfiguration {
+    
+    @Bean
+    public AdminController adminController() {
+        return new AdminController();
+    }
+    
+}
+```
+
+## 通过Spring框架创建对象--其它
+
+无论是组件扫描的做法，还是`@Bean`方法的做法，只要是由Spring执行的创建，被创建出来的对象都会被Spring保管起来，后续，可以通过Spring获取这些对象。
+
+被Spring创建的对象通常称之为Spring Bean。
+
+由于Spring会创建并保管若干个对象，并且，可以通过Spring获取这些对象，所以，也经常把Spring称之为“容器”。
+
+在开发实践中，当需要Spring管理某个类的对象时，通常，如果这个类是自定义的，优先使用组件扫描的做法，如果这个类不是自定义的，只能使用`@Bean`方法的做法！
+
+每个Spring Bean都有一个名字，如果是通过组件扫描的做法创建的Bean，当类名的首字母是大写的，且第2个字母是小写，则此Spring Bean的名称就是将类名的首字母改为小写，例如`AdminController`的Bean Name就是`adminController`，如果不满足首字母大写且第2字母小写的规则，则Spring Bean的名称就是类名；如果是通过`@Bean`方法的做法创建的Bean，则Bean Name就是方法名称。
+
+## Spring Bean的作用域
+
+默认情况下，Spring Bean都是单例的！如果你不希望某个Spring Bean是单例的，可以使用`@Scope("prototype")`，当使用组件扫描的做法时，在组件类上添加此注解，当使用`@Bean`方法的做法时，在方法上添加此注解。
+
+> 单例：在任何时刻，此类的对象最多只有1个。
+>
+> 提示：单例的对象都是常驻内存的，即从创建出来的那一刻，直到程序运行结果，此对象一直在内存中。
+>
+> 提示：Spring并没有使用单例模式，只是Spring Bean具有单例的表现特征。
+
+对于单例的Spring Bean，默认情况下是**预加载**的，如果你不希望某个Spring Bean是预加载的，可以使用`@Lazy`注解，当使用组件扫描的做法时，在组件类上添加此注解，当使用`@Bean`方法的做法时，在方法上添加此注解，会使得Spring Bean是**懒加载**的。
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -63,6 +117,6 @@ Spring框架主要解决了创建对象、管理对象的相关问题。
 
 
 ```java
-User user = new User();
+static
 ```
 

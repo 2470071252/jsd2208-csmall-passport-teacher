@@ -139,6 +139,80 @@ http.authorizeRequests()
 
 并且，以上不冲突各配置可以不区分先后顺序。
 
+## 使用自定义的用户名与密码登录
+
+Spring Security在处理认证时，会自动调用`UserDetailsService`接口对象中的`UserDetails loadUserByUsername(String username)`方法，此方法是**根据用户名获取用户详情**的，此方法返回的结果中应该至少包括用户的密码及其它与登录密切相关的信息，例如账号的状态（是否启用等）、账号的权限等。
+
+在整个处理过程中，Spring Security会根据表单中提交的用户名来调用此方法，并获得用户详情，接下来，由Spring Security去判断用户详情中的信息，例如密码是否正确、账号状态是否正常等。
+
+![image-20221213141209492](images/image-20221213141209492.png)
+
+在项目的根包下创建`security.UserDetailsServiceImpl`类，实现`UserDetailsService`接口，添加`@Service`注解，并重写接口中的方法：
+
+```java
+package cn.tedu.csmall.passport.security;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+@Slf4j
+@Service
+public class UserDetailsServiceImpl implements UserDetailsService {
+
+    @Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        log.debug("Spring Security调用了loadUserByUsername()方法，参数：{}", s);
+
+        // 假设可用的用户名/密码是 root/1234
+        if ("root".equals(s)) {
+            UserDetails userDetails = User.builder()
+                    .username("root")
+                    .password("1234")
+                    .disabled(false) // 账号是否禁用
+                    .accountLocked(false) // 账号是否已锁定
+                    .accountExpired(false) // 账号是否过期
+                    .credentialsExpired(false) // 凭证是否过期
+                    .authorities("这是一个山寨的临时权限，也不知道有什么用") // 权限
+                    .build();
+            return userDetails;
+        }
+
+        // 如果用户名不存在，暂时返回null
+        return null;
+    }
+
+}
+```
+
+> 提示：以上类必须添加`@Service`注解，由于也在组件扫描的包下，所以，Spring会自动创建此类的对象，后续，Spring Security可以自动从容器中找到此类的对象并使用。
+
+完成后，再次启用项目，在控制台可以看到Spring Security不再生成随机的UUID密码了，所以，原本的`user`临时账号已经不再可用，必须使用以上类中配置的账号密码才可以登录！
+
+
+
+
+
+
+
+
+
+```java
+@Autowired(required = false)
+UserDetailsService userDetailsService;
+```
+
+
+
+
+
+
+
+
+
 
 
 ## 提前准备：写出“根据用户名查询用户的登录信息”的Mapper功能，方法名可以使用`getLoginInfoByUsername`，提示：查询结果使用专门的VO类，例如`AdminLoginInfoVO`

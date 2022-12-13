@@ -17,6 +17,14 @@ public enum ServiceCode {
      */
     ERR_BAD_REQUEST(40000),
     /**
+     * 错误：登录失败，用户名或密码错误
+     */
+    ERR_UNAUTHORIZED(40100),
+    /**
+     * 错误：登录失败，账号已经被禁用
+     */
+    ERR_UNAUTHORIZED_DISABLED(40110),
+    /**
      * 错误：数据不存在
      */
     ERR_NOT_FOUND(40400),

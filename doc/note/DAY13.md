@@ -596,11 +596,50 @@ String[] urls = {
 };
 ```
 
+完成后，还应该对登录失败时Spring Security抛出的异常进行处理，首先，在`ServiceCode`中添加对应的业务状态码的枚举：
 
+```java
+public enum ServiceCode {
 
+    OK(20000),
+    ERR_BAD_REQUEST(40000),
+    /**
+     * 【新增】错误：登录失败，用户名或密码错误
+     */
+    ERR_UNAUTHORIZED(40100),
+    /**
+     * 【新增】错误：登录失败，账号已经被禁用
+     */
+    ERR_UNAUTHORIZED_DISABLED(40110),
+    ERR_NOT_FOUND(40400),
+    ERR_CONFLICT(40900);
+    
+    // 其它代码
+```
 
+然后，在`GlobalExceptionHandler`中处理登录失败时可能抛出的3种异常（参见之前Service层的测试结果）：
 
+```java
+@ExceptionHandler
+public JsonResult handleInternalAuthenticationServiceException(InternalAuthenticationServiceException e) {
+    log.debug("开始处理InternalAuthenticationServiceException");
+    String message = "登录失败，用户名不存在！";
+    return JsonResult.fail(ServiceCode.ERR_UNAUTHORIZED, message);
+}
 
+@ExceptionHandler
+public JsonResult handleBadCredentialsException(BadCredentialsException e) {
+    log.debug("开始处理BadCredentialsException");
+    String message = "登录失败，密码错误！";
+    return JsonResult.fail(ServiceCode.ERR_UNAUTHORIZED, message);
+}
 
+@ExceptionHandler
+public JsonResult handleDisabledException(DisabledException e) {
+    log.debug("开始处理DisabledException");
+    String message = "登录失败，账号已经被禁用！";
+    return JsonResult.fail(ServiceCode.ERR_UNAUTHORIZED_DISABLED, message);
+}
+```
 
-
+全部完成后，重启项目，可以通过API文档的调试功能测试访问，无论使用什么样的账号密码，都可以响应匹配的JSON结果。

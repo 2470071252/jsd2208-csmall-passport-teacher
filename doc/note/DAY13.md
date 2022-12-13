@@ -207,18 +207,50 @@ public PasswordEncoder passwordEncoder() {
 - 如果用户名正确，但密码错误，在页面中将提示：`用户名或密码错`
 - 如果用户名与密码均正确，将重定向到此前访问的页面，并且，在API文档中调试任何功能都是可用的
 
+## 关于密码编码器
 
-
-
-
-
-
-
+Spring Security认为所有的密码都应该是加密的，框架中定义了名为`PasswordEncoder`的接口，接口定义如下：
 
 ```java
-@Autowired(required = false)
-UserDetailsService userDetailsService;
+public interface PasswordEncoder {
+    // 执行编码，即：加密
+    String encode(CharSequence var1);
+
+    // 匹配密码，参数1是密码原文，参数2是密文，将返回true/false表示密码是否匹配
+    boolean matches(CharSequence var1, String var2);
+
+    // 升级编码
+    default boolean upgradeEncoding(String encodedPassword) {
+        return false;
+    }
+}
 ```
+
+无论你认为密码是否需要加密，Spring Security处理认证的过程中，在验证密码是否正确时，都会自动调用此接口对象的`matches()`方法，如果在Spring容器中没有此接口的对象，将无法验证密码。
+
+所以，即使使用没有加密的密码，也需要配置`NoOpPasswordEncoder`。
+
+在Spring Security中，提供了`BCryptPasswordEncoder`类，是`PasswordEncoder`接口的实现类，此类可以用于处理Bcrypt算法的编码、验证密码，推荐使用这种密码编码器，关于`BCryptPasswordEncoder`类的基本使用，测试如下：
+
+```java
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

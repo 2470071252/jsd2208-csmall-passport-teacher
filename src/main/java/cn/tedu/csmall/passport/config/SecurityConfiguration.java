@@ -39,6 +39,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         // 可以使用 * 通配符，例如 /admins/* 可以匹配 /admins/add-new，但是，不能匹配多级，例如不能匹配到 /admins/9527/delete
         // 可以使用 ** 通配符，例如 /admins/** 可以匹配若干级，例如可以匹配 /admins/add-new，也可以匹配到 /admins/9527/delete
         String[] urls = {
+                "/admins/login",
                 "/doc.html",
                 "/**/*.css",
                 "/**/*.js",
@@ -58,7 +59,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         // 禁用“防止伪造的跨域攻击”这种防御机制
         http.csrf().disable();
 
-        http.formLogin(); // 开启登录表单
+        // http.formLogin(); // 开启登录表单
     }
 
 }

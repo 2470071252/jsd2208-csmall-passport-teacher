@@ -458,6 +458,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   - 在`AdminServiceImpl`中实现处理登录的业务，通过`AuthenticationManager`对象的`authenticate()`方法，将用户名、密码交给Spring Security框架去执行认证过程
 - 在控制器中处理登录请求
   - 在控制器中添加新的方法，用于处理登录请求，具体的处理过程由Service层实现
+  - 注意：应该将登录的请求路径配置在“白名单”中
+  - 在全局异常处理器中，对登录失败时Spring Security抛出的异常进行处理
 
 在`SecurityConfiguration`中补充：
 
@@ -563,6 +565,35 @@ org.springframework.security.authentication.BadCredentialsException: 用户名�
 
 ```
 org.springframework.security.authentication.DisabledException: 用户已失效
+```
+
+接下来，调整控制器层，先在`AdminController`中添加处理请求的方法：
+
+```java
+// http://localhost:9081/admins/login
+@ApiOperation("管理员登录")
+@ApiOperationSupport(order = 50)
+@PostMapping("/login")
+public JsonResult login(AdminLoginDTO adminLoginDTO) {
+    log.debug("开始处理【管理员登录】的请求，参数：{}", adminLoginDTO);
+    adminService.login(adminLoginDTO);
+    return JsonResult.ok();
+}
+```
+
+然后，在`SecurityConfiguration`中，将登录的URL添加到白名单中：
+
+```java
+String[] urls = {
+        "/admins/login", // 新增
+        "/doc.html",
+        "/**/*.css",
+        "/**/*.js",
+        "/a.jpg",
+        "/favicon.ico",
+        "/swagger-resources",
+        "/v2/api-docs"
+};
 ```
 
 

@@ -117,6 +117,16 @@
             id=#{id}
     </select>
 
+    <!-- AdminLoginInfoVO getLoginInfoByUsername(String username); -->
+    <select id="getLoginInfoByUsername" resultMap="LoginInfoResultMap">
+        SELECT
+            <include refid="LoginInfoQueryFields"/>
+        FROM
+            ams_admin
+        WHERE
+            username=#{username}
+    </select>
+
     <!-- List<AdminListItemVO> list(); -->
     <select id="list" resultMap="ListResultMap">
         SELECT
@@ -132,6 +142,12 @@
             id, username, nickname, avatar, phone,
             email, description, enable, last_login_ip, login_count,
             gmt_last_login
+        </if>
+    </sql>
+
+    <sql id="LoginInfoQueryFields">
+        <if test="true">
+            id, username, password, enable
         </if>
     </sql>
 
@@ -155,6 +171,13 @@
         <result column="last_login_ip" property="lastLoginIp"/>
         <result column="login_count" property="loginCount"/>
         <result column="gmt_last_login" property="gmtLastLogin"/>
+    </resultMap>
+
+    <resultMap id="LoginInfoResultMap" type="cn.tedu.csmall.passport.pojo.vo.AdminLoginInfoVO">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="enable" property="enable"/>
     </resultMap>
 
     <resultMap id="ListResultMap" type="cn.tedu.csmall.passport.pojo.vo.AdminListItemVO">

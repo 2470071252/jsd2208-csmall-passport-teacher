@@ -312,33 +312,138 @@ if ("root".equals(s)) {
 }
 ```
 
+## 使用数据库的账号登录
 
+首先，需要在Mapper层实现“根据用户名查询管理员的登录信息”的功能。
 
+在项目的根包下创建`pojo.vo.AdminLoginInfoVO`类：
 
+```java
+package cn.tedu.csmall.passport.pojo.vo;
 
+import lombok.Data;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
+/**
+ * 管理员的登录信息VO类
+ *
+ * @author java@tedu.cn
+ * @version 0.0.1
+ */
+@Data
+public class AdminLoginInfoVO implements Serializable {
 
+    /**
+     * 数据id
+     */
+    private Long id;
 
+    /**
+     * 用户名
+     */
+    private String username;
 
+    /**
+     * 密码（密文）
+     */
+    private String password;
 
+    /**
+     * 是否启用，1=启用，0=未启用
+     */
+    private Integer enable;
 
+}
+```
 
+在`AdminMapper.java`接口中声明抽象方法：
 
+```java
+/**
+ * 根据管理员用户名查询管理登录信息
+ * @param username 用户名
+ * @return 匹配的登录信息，如果没有匹配的数据，则返回null
+ */
+AdminLoginInfoVO getLoginInfoByUsername(String username);
+```
 
+在`AdminMapper.xml`中配置查询的SQL语句：
 
+```xml
+<!-- AdminLoginInfoVO getLoginInfoByUsername(String username); -->
+<select id="getLoginInfoByUsername" resultMap="LoginInfoResultMap">
+    SELECT
+        <include refid="LoginInfoQueryFields"/>
+    FROM
+        ams_admin
+    WHERE
+        username=#{username}
+</select>
 
+<sql id="LoginInfoQueryFields">
+    <if test="true">
+        id, username, password, enable
+    </if>
+</sql>
 
+<resultMap id="LoginInfoResultMap" 
+           type="cn.tedu.csmall.passport.pojo.vo.AdminLoginInfoVO">
+    <id column="id" property="id"/>
+    <result column="username" property="username"/>
+    <result column="password" property="password"/>
+    <result column="enable" property="enable"/>
+</resultMap>
+```
 
+在`AdminMapperTests`中编写并执行测试：
 
+```java
+@Test
+void getLoginInfoByUsername() {
+    String username = "root";
+    Object queryResult = mapper.getLoginInfoByUsername(username);
+    log.debug("根据用户名【{}】查询数据详情完成，查询结果：{}", username, queryResult);
+}
+```
 
+完成后，调整`UserDetailsServiceImpl`中的具体实现：
 
+```java
+@Slf4j
+@Service
+public class UserDetailsServiceImpl implements UserDetailsService {
 
+    @Autowired
+    private AdminMapper adminMapper;
 
+    @Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        log.debug("Spring Security调用了loadUserByUsername()方法，参数：{}", s);
 
+        AdminLoginInfoVO loginInfo = adminMapper.getLoginInfoByUsername(s);
+        log.debug("从数据库查询用户名【{}】匹配的信息，结果：{}", s, loginInfo);
 
+        if (loginInfo == null) {
+            return null; // 暂时
+        }
 
-## 提前准备：写出“根据用户名查询用户的登录信息”的Mapper功能，方法名可以使用`getLoginInfoByUsername`，提示：查询结果使用专门的VO类，例如`AdminLoginInfoVO`
+        UserDetails userDetails = User.builder()
+                .username(loginInfo.getUsername())
+                .password(loginInfo.getPassword())
+                .disabled(loginInfo.getEnable() == 0)
+                .accountLocked(false) // 账号是否已锁定
+                .accountExpired(false) // 账号是否过期
+                .credentialsExpired(false) // 凭证是否过期
+                .authorities("这是一个山寨的临时权限，也不知道有什么用") // 权限
+                .build();
+        log.debug("即将向Spring Security返回UserDetails对象：{}", userDetails);
+        return userDetails;
+    }
+
+}
+```
 
 
 

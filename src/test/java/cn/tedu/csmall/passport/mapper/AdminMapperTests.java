@@ -102,6 +102,13 @@ public class AdminMapperTests {
     }
 
     @Test
+    void getLoginInfoByUsername() {
+        String username = "root";
+        Object queryResult = mapper.getLoginInfoByUsername(username);
+        log.debug("根据用户名【{}】查询数据详情完成，查询结果：{}", username, queryResult);
+    }
+
+    @Test
     void list() {
         List<?> list = mapper.list();
         log.debug("查询列表完成，列表中的数据的数量：{}", list.size());

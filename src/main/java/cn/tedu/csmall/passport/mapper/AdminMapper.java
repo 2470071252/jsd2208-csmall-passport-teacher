@@ -2,6 +2,7 @@ package cn.tedu.csmall.passport.mapper;
 
 import cn.tedu.csmall.passport.pojo.entity.Admin;
 import cn.tedu.csmall.passport.pojo.vo.AdminListItemVO;
+import cn.tedu.csmall.passport.pojo.vo.AdminLoginInfoVO;
 import cn.tedu.csmall.passport.pojo.vo.AdminStandardVO;
 import org.springframework.stereotype.Repository;
 
@@ -92,6 +93,13 @@ public interface AdminMapper {
      * @return 匹配的管理员数据详情，如果没有匹配的数据，则返回null
      */
     AdminStandardVO getStandardById(Long id);
+
+    /**
+     * 根据管理员用户名查询管理登录信息
+     * @param username 用户名
+     * @return 匹配的登录信息，如果没有匹配的数据，则返回null
+     */
+    AdminLoginInfoVO getLoginInfoByUsername(String username);
 
     /**
      * 查询管理员数据列表

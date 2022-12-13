@@ -190,7 +190,22 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 > 提示：以上类必须添加`@Service`注解，由于也在组件扫描的包下，所以，Spring会自动创建此类的对象，后续，Spring Security可以自动从容器中找到此类的对象并使用。
 
+Spring Security在验证密码时，会自动调用密码编码器，则需要配置某个密码编码器，由于以上代码中配置的密码`"1234"`并不是密文，可以暂时使用`NoOpPasswordEncoder`。则在`SecurityConfiguration`中添加：
+
+```java
+@Bean
+public PasswordEncoder passwordEncoder() {
+    return NoOpPasswordEncoder.getInstance(); // NoOpPasswordEncoder是“不加密”的密码编码器
+}
+```
+
 完成后，再次启用项目，在控制台可以看到Spring Security不再生成随机的UUID密码了，所以，原本的`user`临时账号已经不再可用，必须使用以上类中配置的账号密码才可以登录！
+
+登录效果如下：
+
+- 如果用户名错误，在页面中将提示：`UserDetailsService returned null, which is an interface contract violation`
+- 如果用户名正确，但密码错误，在页面中将提示：`用户名或密码错`
+- 如果用户名与密码均正确，将重定向到此前访问的页面，并且，在API文档中调试任何功能都是可用的
 
 
 

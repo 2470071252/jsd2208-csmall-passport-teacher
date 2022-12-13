@@ -15,11 +15,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         log.debug("Spring Security调用了loadUserByUsername()方法，参数：{}", s);
 
-        // 假设可用的用户名/密码是 root/1234
+        // 假设可用的用户名/密码是 root/123456
         if ("root".equals(s)) {
             UserDetails userDetails = User.builder()
                     .username("root")
-                    .password("1234")
+                    .password("$2a$10$XGvx1Y/.B.fSUt2uS3m43OaFkgZCWs.isoLjXw5O1YTbX1QE001x6")
                     .disabled(false) // 账号是否禁用
                     .accountLocked(false) // 账号是否已锁定
                     .accountExpired(false) // 账号是否过期

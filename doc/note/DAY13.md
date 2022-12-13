@@ -233,7 +233,83 @@ public interface PasswordEncoder {
 在Spring Security中，提供了`BCryptPasswordEncoder`类，是`PasswordEncoder`接口的实现类，此类可以用于处理Bcrypt算法的编码、验证密码，推荐使用这种密码编码器，关于`BCryptPasswordEncoder`类的基本使用，测试如下：
 
 ```java
+package cn.tedu.csmall.passport;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+public class BcryptTest {
+
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    @Test
+    void encode() {
+        String rawPassword = "123456";
+        System.out.println("原文：" + rawPassword);
+
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 20; i++) {
+            String encodedPassword = passwordEncoder.encode(rawPassword);
+            System.out.println("密文：" + encodedPassword);
+        }
+        long end = System.currentTimeMillis();
+
+        System.out.println("耗时：" + (end - start));
+    }
+
+    //    原文：123456
+    //    密文：$2a$10$XGvx1Y/.B.fSUt2uS3m43OaFkgZCWs.isoLjXw5O1YTbX1QE001x6
+    //    密文：$2a$10$m1XBX0V9Jk8sGO.oZVxF5O3nxRQ/bZjKMGuBn.og74ddrvNfkR1YC
+    //    密文：$2a$10$65z1UUvAaNHeit4GgMN8auoEx5ZXYBJI9/bG.HYQiS5YgYkqeARlG
+    //    密文：$2a$10$CSr3Js2mu1d/LSJiVTrLQ.11STmG9lFZvO4o5zmyTAu8xOlCjwyf6
+    //    密文：$2a$10$WYI2xGW5wJCnG7jz6qOXruDPzS6o9tO9IBdbG3eQpPpbCsvOkl1NK
+    //    密文：$2a$10$cs4HLJCvqD8PmHYqcANiiuRpXZMy4Pf3ubbG3EIaOZ.TqyDr5iLuu
+
+    @Test
+    void matches() {
+        String rawPassword = "123456";
+        System.out.println("原文：" + rawPassword);
+
+        String encodedPassword = "$2a$10$cs4HLJCvqD8PmHYqcANiiuRpXZMy4Pf3ubbG3EIaOZ.TqyDr5iLuu";
+        System.out.println("密文：" + encodedPassword);
+
+        boolean matches = passwordEncoder.matches(rawPassword, encodedPassword);
+        System.out.println("匹配结果：" + matches);
+    }
+
+}
+```
+
+在项目中，使用Bcrypt算法处理密码时，需要将`PasswordEncoder`的实现对象改为`BCryptPasswordEncoder`：
+
+```java
+@Bean
+public PasswordEncoder passwordEncoder() {
+    // return NoOpPasswordEncoder.getInstance(); // NoOpPasswordEncoder是“不加密”的密码编码器
+    return new BCryptPasswordEncoder();
+}
+```
+
+经过以上调整后，在`UserDetailsServiceImpl`中返回的`UserDetails`对象中的密码也必须是BCrypt算法的密文，例如：
+
+```java
+// 假设可用的用户名/密码是 root/123456
+if ("root".equals(s)) {
+    UserDetails userDetails = User.builder()
+            .username("root")
+        
+        	// 		   ↓↓↓↓↓ 调整 
+            .password("$2a$10$XGvx1Y/.B.fSUt2uS3m43OaFkgZCWs.isoLjXw5O1YTbX1QE001x6")
+        
+            .disabled(false) // 账号是否禁用
+            .accountLocked(false) // 账号是否已锁定
+            .accountExpired(false) // 账号是否过期
+            .credentialsExpired(false) // 凭证是否过期
+            .authorities("这是一个山寨的临时权限，也不知道有什么用") // 权限
+            .build();
+    return userDetails;
+}
 ```
 
 

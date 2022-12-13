@@ -31,5 +31,16 @@ public class BcryptTest {
     //    密文：$2a$10$WYI2xGW5wJCnG7jz6qOXruDPzS6o9tO9IBdbG3eQpPpbCsvOkl1NK
     //    密文：$2a$10$cs4HLJCvqD8PmHYqcANiiuRpXZMy4Pf3ubbG3EIaOZ.TqyDr5iLuu
 
+    @Test
+    void matches() {
+        String rawPassword = "123456";
+        System.out.println("原文：" + rawPassword);
+
+        String encodedPassword = "$2a$10$cs4HLJCvqD8PmHYqcANiiuRpXZMy4Pf3ubbG3EIaOZ.TqyDr5iLuu";
+        System.out.println("密文：" + encodedPassword);
+
+        boolean matches = passwordEncoder.matches(rawPassword, encodedPassword);
+        System.out.println("匹配结果：" + matches);
+    }
 
 }

@@ -1,6 +1,7 @@
 package cn.tedu.csmall.passport.service;
 
 import cn.tedu.csmall.passport.pojo.dto.AdminAddNewDTO;
+import cn.tedu.csmall.passport.pojo.dto.AdminLoginDTO;
 import cn.tedu.csmall.passport.pojo.vo.AdminListItemVO;
 
 import java.util.List;
@@ -12,6 +13,12 @@ import java.util.List;
  * @version 0.0.1
  */
 public interface IAdminService {
+
+    /**
+     * 管理员登录
+     * @param adminLoginDTO 封装了登录参数的对象
+     */
+    void login(AdminLoginDTO adminLoginDTO);
 
     /**
      * 添加管理员

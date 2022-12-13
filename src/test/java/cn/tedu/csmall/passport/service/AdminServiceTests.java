@@ -2,6 +2,7 @@ package cn.tedu.csmall.passport.service;
 
 import cn.tedu.csmall.passport.ex.ServiceException;
 import cn.tedu.csmall.passport.pojo.dto.AdminAddNewDTO;
+import cn.tedu.csmall.passport.pojo.dto.AdminLoginDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,22 @@ public class AdminServiceTests {
 
     @Autowired
     IAdminService service;
+
+    @Test
+    void login() {
+        AdminLoginDTO adminLoginDTO = new AdminLoginDTO();
+        adminLoginDTO.setUsername("wangkejing");
+        adminLoginDTO.setPassword("123456");
+
+        try {
+            service.login(adminLoginDTO);
+        } catch (Throwable e) {
+            // 由于不确定Spring Security会抛出什么类型的异常
+            // 所以，捕获的是Throwable
+            // 并且，在处理时，应该打印信息，以了解什么情况下会出现哪种异常
+            e.printStackTrace();
+        }
+    }
 
     @Test
     void addNew() {

@@ -3,6 +3,7 @@ package cn.tedu.csmall.passport.service.impl;
 import cn.tedu.csmall.passport.ex.ServiceException;
 import cn.tedu.csmall.passport.mapper.AdminMapper;
 import cn.tedu.csmall.passport.pojo.dto.AdminAddNewDTO;
+import cn.tedu.csmall.passport.pojo.dto.AdminLoginDTO;
 import cn.tedu.csmall.passport.pojo.entity.Admin;
 import cn.tedu.csmall.passport.pojo.vo.AdminListItemVO;
 import cn.tedu.csmall.passport.pojo.vo.AdminStandardVO;
@@ -11,6 +12,9 @@ import cn.tedu.csmall.passport.web.ServiceCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,9 +31,21 @@ public class AdminServiceImpl implements IAdminService {
 
     @Autowired
     private AdminMapper adminMapper;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     public AdminServiceImpl() {
         log.debug("创建业务对象：AdminServiceImpl");
+    }
+
+    @Override
+    public void login(AdminLoginDTO adminLoginDTO) {
+        log.debug("开始处理【管理员登录】的业务，参数：{}", adminLoginDTO);
+        // 执行认证
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                adminLoginDTO.getUsername(), adminLoginDTO.getPassword());
+        authenticationManager.authenticate(authentication);
+        log.debug("认证通过！");
     }
 
     @Override

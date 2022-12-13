@@ -445,6 +445,130 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 }
 ```
 
+## 使用前后端分离的登录
+
+目前，项目中可以通过数据库中的账号信息进行登录，但是，是通过Spring Security提供的登录表单来登录的，这不是前后端分离的做法，`csmall-web-client`无法与此进行交互。
+
+要使得当前服务器端是前后端分离的模式，需要：
+
+- 在`SecurityConfiguration`中重写`authenticationManagerBean()`方法，并在方法上添加`@Bean`注解
+- 创建封装了登录信息的DTO类，即`AdminLoginDTO`，此类中应该封装用户名、密码这2个属性
+- 在Service层处理登录业务
+  - 在`IAdminService`中添加抽象方法
+  - 在`AdminServiceImpl`中实现处理登录的业务，通过`AuthenticationManager`对象的`authenticate()`方法，将用户名、密码交给Spring Security框架去执行认证过程
+- 在控制器中处理登录请求
+  - 在控制器中添加新的方法，用于处理登录请求，具体的处理过程由Service层实现
+
+在`SecurityConfiguration`中补充：
+
+```java
+@Bean
+@Override
+public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+}
+```
+
+在根包下创建`pojo.dto.AdminLoginDTO`类：
+
+```java
+package cn.tedu.csmall.passport.pojo.dto;
+
+import lombok.Data;
+
+import java.io.Serializable;
+
+/**
+ * 管理员登录的DTO类
+ *
+ * @author java@tedu.cn
+ * @version 0.0.1
+ */
+@Data
+public class AdminLoginDTO implements Serializable {
+
+    /**
+     * 用户名
+     */
+    private String username;
+
+    /**
+     * 密码（原文）
+     */
+    private String password;
+
+}
+```
+
+在`IAdminService`中添加抽象方法：
+
+```java
+/**
+ * 管理员登录
+ * @param adminLoginDTO 封装了登录参数的对象
+ */
+void login(AdminLoginDTO adminLoginDTO);
+```
+
+在`AdminServiceImpl`中，先自动装配`AuthenticationManager`对象，然后，重写接口中抽象方法，实现登录的业务：
+
+```java
+@Autowired
+private AuthenticationManager authenticationManager;
+
+@Override
+public void login(AdminLoginDTO adminLoginDTO) {
+    log.debug("开始处理【管理员登录】的业务，参数：{}", adminLoginDTO);
+    // 执行认证
+    Authentication authentication = new UsernamePasswordAuthenticationToken(
+            adminLoginDTO.getUsername(), adminLoginDTO.getPassword());
+    authenticationManager.authenticate(authentication);
+    log.debug("认证通过！");
+}
+```
+
+在`AdminServiceTests`中编写并执行测试：
+
+```java
+@Test
+void login() {
+    AdminLoginDTO adminLoginDTO = new AdminLoginDTO();
+    adminLoginDTO.setUsername("wangkejing");
+    adminLoginDTO.setPassword("123456");
+
+    try {
+        service.login(adminLoginDTO);
+    } catch (Throwable e) {
+        // 由于不确定Spring Security会抛出什么类型的异常
+        // 所以，捕获的是Throwable
+        // 并且，在处理时，应该打印信息，以了解什么情况下会出现哪种异常
+        e.printStackTrace();
+    }
+}
+```
+
+当测试时使用的用户名是错误的，异常信息如下：
+
+```
+org.springframework.security.authentication.InternalAuthenticationServiceException: UserDetailsService returned null, which is an interface contract violation
+```
+
+当测试时使用的密码是错误的，异常信息如下：
+
+```
+org.springframework.security.authentication.BadCredentialsException: 用户名或密码错误
+```
+
+当测试时使用的账号是禁用的（`enable`值为`0`），异常信息如下：
+
+```
+org.springframework.security.authentication.DisabledException: 用户已失效
+```
+
+
+
+
+
 
 
 

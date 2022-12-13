@@ -25,6 +25,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/doc.html",
                 "/**/*.css",
                 "/**/*.js",
+                "/a.jpg",
                 "/favicon.ico",
                 "/swagger-resources",
                 "/v2/api-docs"
@@ -39,6 +40,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // 禁用“防止伪造的跨域攻击”这种防御机制
         http.csrf().disable();
+
+        http.formLogin(); // 开启登录表单
     }
 
 }

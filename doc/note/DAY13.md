@@ -60,7 +60,7 @@ Spring Security的防御机制表现为：所有POST请求必须提交某个值�
 
 在当前项目中，后续会实现基于JWT的认证机制，这种机制本身就是不会出现“伪造的跨域攻击”相关问题的，所以，直接将此防御机制禁用即可！
 
-在项目的根包下创建`config.ScurityConfiguration`配置类，继承自`WebSecurityConfigurerAdapter`类，重写`void configurer(HttpSecurity)`方法，在此方法中：
+在项目的根包下创建`config.ScurityConfiguration`配置类，继承自`WebSecurityConfigurerAdapter`类，重写`void configure(HttpSecurity)`方法，在此方法中：
 
 - 不调用父类的方法，即删除通过`super`调用父类方法的语句
   - 删除后，默认情况下，所有的请求都不需要登录了
@@ -72,15 +72,43 @@ Spring Security的防御机制表现为：所有POST请求必须提交某个值�
 
 在项目中，应该将某些请求配置为需要认证的，还有一些请求是不需要认证的！例如，在线API文档的相关页面应该是不需要认证即可访问的，而管理员管理的相关请求（例如添加管理员、删除管理员等）是需要认证才允许访问的！
 
-则在配置类中的`void configurer(HttpSecurity)`方法中：
+则在配置类中的`void configure(HttpSecurity)`方法中添加以下配置：
 
 ```java
+// 白名单URL
+// 注意：所有路径使用 / 作为第1个字符
+// 可以使用 * 通配符，例如 /admins/* 可以匹配 /admins/add-new，但是，不能匹配多级，例如不能匹配到 /admins/9527/delete
+// 可以使用 ** 通配符，例如 /admins/** 可以匹配若干级，例如可以匹配 /admins/add-new，也可以匹配到 /admins/9527/delete
+String[] urls = {
+        "/doc.html",
+        "/**/*.css",
+        "/**/*.js",
+        "/favicon.ico",
+        "/swagger-resources",
+        "/v2/api-docs"
+};
 
+// 配置请求是否需要认证
+http.authorizeRequests() // 配置请求的认证授权
+        .mvcMatchers(urls) // 匹配某些请求路径
+        .permitAll() // 允许直接访问，即不需要通过认证
+        .anyRequest() // 其它任何请求
+        .authenticated(); // 需要是通过认证的
 ```
 
+**注意：**以上`anyRequest()`其实表示的是“任何请求”或者“所有请求”，并非“其它任何请求”！以上配置的机制是**优先原则**，例如“白名单”中的路径被配置为`permitAll()`，接下来，`anyRequest()`表示的范围其实也包含“白名单”中的所有路径，但是，不会覆盖此前的配置！
 
+## 关于默认的登录页面
 
+Spring Security默认的登录页面也是在`void configure(HttpSecurity)`方法中配置的，默认情况下，父类配置中是开启了登录表单的，如果子类（自定义的配置类继承自`WebSecurityConfigurerAdapter`）中没有通过`super`调用父类的方法，则不会开启登录表单！
 
+在没有开启登录表单的情况下，如果被视为“未认证”，将响应`403`错误。
+
+如果需要开启登录表单，可以在配置方法中添加：
+
+```java
+http.formLogin(); // 开启登录表单
+```
 
 
 

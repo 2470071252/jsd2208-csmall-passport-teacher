@@ -110,9 +110,38 @@ Spring Security默认的登录页面也是在`void configure(HttpSecurity)`方�
 http.formLogin(); // 开启登录表单
 ```
 
+## 关于`void configure(HttpSecurity)`方法的配置语法
+
+关于请求的安全配置都是在`void configure(HttpSecurity http)`方法中调用参数对象的方法配置的，对于配置不同的内容，可以分开来配置，即使用多条语句，每条语句都调用参数`http`的方法，例如：
+
+```java
+// 所有请求都必须是通过认证的
+http.authorizeRequests().anyRequest().authenticated();
+
+// 禁用“防止伪造的跨域攻击”这种防御机制
+http.csrf().disable();
+
+http.formLogin(); // 开启登录表单
+```
+
+这些配置的设计也支持链式语法：
+
+```java
+http.authorizeRequests()
+        .anyRequest()
+        .authenticated()
+        .and() // 重点
+        .csrf().disable()
+        .formLogin();
+```
+
+简单来说，如果要使用链式语法，当“打点”后不能调用相关的配置方法，就调用`and()`方法，此方法会返回当前参数对象，即`HttpSecurity`对象，然后继续“打点”进行其它配置。
+
+并且，以上不冲突各配置可以不区分先后顺序。
 
 
 
+## 提前准备：写出“根据用户名查询用户的登录信息”的Mapper功能，方法名可以使用`getLoginInfoByUsername`，提示：查询结果使用专门的VO类，例如`AdminLoginInfoVO`
 
 
 

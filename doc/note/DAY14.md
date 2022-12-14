@@ -255,6 +255,18 @@ public JsonResult handleAccessDeniedException(AccessDeniedException e) {
 
 完成后，启用项目，在数据表中的数据都是初始测试数据的情况下，使用`root`账号登录，可以删除管理员，使用其它账号登录，将因为权限不足而无法执行删除管理员操作。
 
+## 认证处理流程
+
+![image-20221214162329639](images/image-20221214162329639.png)
+
+
+
+
+
+
+
+
+
 
 
 

@@ -115,12 +115,17 @@ public void login(AdminLoginDTO adminLoginDTO) {
 首先，需要修改Mapper层原有的`getLoginInfoByUsername()`方法的查询，要求查出管理员的权限！需要执行的SQL语句大致是：
 
 ```mysql
-SELECT 
-	字段列表 
-FROM 
-	ams_admin 
-WHERE 
-	username=?
+SELECT
+    ams_admin.id,
+    ams_admin.username,
+    ams_admin.password,
+    ams_admin.enable,
+    ams_permission.value
+FROM ams_admin
+LEFT JOIN ams_admin_role ON ams_admin.id=ams_admin_role.admin_id
+LEFT JOIN ams_role_permission ON ams_admin_role.role_id=ams_role_permission.role_id
+LEFT JOIN ams_permission ON ams_role_permission.permission_id=ams_permission.id
+WHERE username='root';
 ```
 
 

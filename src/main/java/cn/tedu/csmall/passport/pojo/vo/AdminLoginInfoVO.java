@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 管理员的登录信息VO类
@@ -33,5 +34,10 @@ public class AdminLoginInfoVO implements Serializable {
      * 是否启用，1=启用，0=未启用
      */
     private Integer enable;
+
+    /**
+     * 权限列表
+     */
+    private List<String> permissions;
 
 }

@@ -125,10 +125,80 @@ FROM ams_admin
 LEFT JOIN ams_admin_role ON ams_admin.id=ams_admin_role.admin_id
 LEFT JOIN ams_role_permission ON ams_admin_role.role_id=ams_role_permission.role_id
 LEFT JOIN ams_permission ON ams_role_permission.permission_id=ams_permission.id
-WHERE username='root';
+WHERE ams_admin.username='root';
+```
+
+在`AdminLoginInfoVO`中添加新的属性，用于表示此管理员的权限：
+
+```java
+/**
+ * 权限列表
+ */
+private List<String> permissions;
+```
+
+然后，调整`AdminMapper.xml`中配置：
+
+```xml
+<!-- AdminLoginInfoVO getLoginInfoByUsername(String username); -->
+<select id="getLoginInfoByUsername" resultMap="LoginInfoResultMap">
+    SELECT
+        <include refid="LoginInfoQueryFields"/>
+    FROM
+        ams_admin
+    LEFT JOIN ams_admin_role ON ams_admin.id=ams_admin_role.admin_id
+    LEFT JOIN ams_role_permission ON ams_admin_role.role_id=ams_role_permission.role_id
+    LEFT JOIN ams_permission ON ams_role_permission.permission_id=ams_permission.id
+    WHERE
+        username=#{username}
+</select>
+
+<sql id="LoginInfoQueryFields">
+    <if test="true">
+        ams_admin.id,
+        ams_admin.username,
+        ams_admin.password,
+        ams_admin.enable,
+        ams_permission.value
+    </if>
+</sql>
+
+<!-- collection标签：用于封装List结果，也可理解为1对多的结果，例如1个管理员有多个权限，则权限需要通过此标签来配置 -->
+<!-- collection标签的property属性：取值为封装结果中的类的属性名 -->
+<!-- collection标签的ofType属性：取值为List集合属性中的元素类型的全限定名，如果是java.lang包下的类，可以不写包名 -->
+<!-- collection标签的子级：配置如何创建出ofType的对象，可以通过constructor标签配置简单的对象如何创建，也可以使用id标签和若干个result标签配置较复杂的对象 -->
+<!-- 注意：当存在“非单表”查询时，即使column与property的值相同，也必须配置 -->
+<resultMap id="LoginInfoResultMap" type="cn.tedu.csmall.passport.pojo.vo.AdminLoginInfoVO">
+    <id column="id" property="id"/>
+    <result column="username" property="username"/>
+    <result column="password" property="password"/>
+    <result column="enable" property="enable"/>
+    <collection property="permissions" ofType="java.lang.String">
+        <constructor>
+            <arg column="value"/>
+        </constructor>
+    </collection>
+</resultMap>
 ```
 
 
+
+```
+2022-12-14 14:38:51.284 DEBUG 1264 --- [           main] c.t.c.passport.mapper.AdminMapperTests   : 根据用户名【root】查询数据详情完成，查询结果：
+
+AdminLoginInfoVO(
+	id=1, 
+	username=root, 
+	password=$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj15C, 
+	enable=1, 
+	permissions=[
+		/ams/admin/read, 
+		/ams/admin/add-new, 
+		/ams/admin/delete, 
+		/ams/admin/update, 
+		/pms/product/read, /pms/product/add-new, /pms/product/delete, /pms/product/update, /pms/brand/read, /pms/brand/add-new, /pms/brand/delete, /pms/brand/update, /pms/category/read, /pms/category/add-new, /pms/category/delete, /pms/category/update, /pms/picture/read, /pms/picture/add-new, /pms/picture/delete, /pms/picture/update, /pms/album/read, /pms/album/add-new, /pms/album/delete, /pms/album/update
+	])
+```
 
 
 

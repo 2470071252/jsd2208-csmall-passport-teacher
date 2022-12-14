@@ -102,7 +102,26 @@ public void login(AdminLoginDTO adminLoginDTO) {
 }
 ```
 
+## 关于管理员（用户）的权限设计
 
+当前项目中，权限使用了 RBAC 的设计原则，具体可参考《CoolShark商城数据库与数据表设计(v1.0)-03.后台管理员管理相关数据表设计.pdf》。
+
+## 实现访问控制
+
+在`csmall_ams.sql`脚本插入中的测试数据中，已经给出了权限、角色、管理员及相关的关联测试数据，也就是说，各管理员账号都有关联的角色，各角色也有关联的权限！
+
+当管理员尝试登录时，应该读取此管理员的权限，最终，存入到`SecurityContext`中，则Spring Security随时可以知道此管理员的权限，并判断是否允许执行某些操作，以实现访问控制！
+
+首先，需要修改Mapper层原有的`getLoginInfoByUsername()`方法的查询，要求查出管理员的权限！需要执行的SQL语句大致是：
+
+```mysql
+SELECT 
+	字段列表 
+FROM 
+	ams_admin 
+WHERE 
+	username=?
+```
 
 
 

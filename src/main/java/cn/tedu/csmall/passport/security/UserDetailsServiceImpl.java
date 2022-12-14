@@ -35,7 +35,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .accountLocked(false) // 账号是否已锁定
                 .accountExpired(false) // 账号是否过期
                 .credentialsExpired(false) // 凭证是否过期
-                .authorities("这是一个山寨的临时权限，也不知道有什么用") // 权限
+                .authorities(loginInfo.getPermissions().toArray(new String[]{})) // 权限
                 .build();
         log.debug("即将向Spring Security返回UserDetails对象：{}", userDetails);
         return userDetails;

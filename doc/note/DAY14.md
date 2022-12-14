@@ -181,23 +181,29 @@ private List<String> permissions;
 </resultMap>
 ```
 
+完成后，可以使用`AdminMapperTests`中原有的测试方法测试访问。
 
+接下来，调整`UserDetailsServiceImpl`中的实现，在向Spring Security返回`UserDetails`之前，向对象中封装查询出来的权限信息：
+
+```java
+UserDetails userDetails = User.builder()
+    .username(loginInfo.getUsername())
+    .password(loginInfo.getPassword())
+    .disabled(loginInfo.getEnable() == 0)
+    .accountLocked(false)
+    .accountExpired(false)
+    .credentialsExpired(false)
+    .authorities(loginInfo.getPermissions().toArray(new String[]{})) // 调整此行
+    .build();
+log.debug("即将向Spring Security返回UserDetails对象：{}", userDetails);
+```
+
+完成后，重启项目，使用正确的用户名、密码登录状态正常的（未禁用的）账号，在控制台可以看到返回的`UserDetails`信息中包含此账号的权限，例如：
 
 ```
-2022-12-14 14:38:51.284 DEBUG 1264 --- [           main] c.t.c.passport.mapper.AdminMapperTests   : 根据用户名【root】查询数据详情完成，查询结果：
-
-AdminLoginInfoVO(
-	id=1, 
-	username=root, 
-	password=$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj15C, 
-	enable=1, 
-	permissions=[
-		/ams/admin/read, 
-		/ams/admin/add-new, 
-		/ams/admin/delete, 
-		/ams/admin/update, 
-		/pms/product/read, /pms/product/add-new, /pms/product/delete, /pms/product/update, /pms/brand/read, /pms/brand/add-new, /pms/brand/delete, /pms/brand/update, /pms/category/read, /pms/category/add-new, /pms/category/delete, /pms/category/update, /pms/picture/read, /pms/picture/add-new, /pms/picture/delete, /pms/picture/update, /pms/album/read, /pms/album/add-new, /pms/album/delete, /pms/album/update
-	])
+2022-12-14 15:03:56.504 DEBUG 3432 --- [nio-9081-exec-2] c.t.c.p.security.UserDetailsServiceImpl  : 
+即将向Spring Security返回UserDetails对象：
+org.springframework.security.core.userdetails.User [Username=root, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, credentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[/ams/admin/add-new, /ams/admin/delete, /ams/admin/read, /ams/admin/update, /pms/album/add-new, /pms/album/delete, /pms/album/read, /pms/album/update, /pms/brand/add-new, /pms/brand/delete, /pms/brand/read, /pms/brand/update, /pms/category/add-new, /pms/category/delete, /pms/category/read, /pms/category/update, /pms/picture/add-new, /pms/picture/delete, /pms/picture/read, /pms/picture/update, /pms/product/add-new, /pms/product/delete, /pms/product/read, /pms/product/update]]
 ```
 
 

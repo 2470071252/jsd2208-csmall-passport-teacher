@@ -36,10 +36,10 @@ public class AdminServiceTests {
     @Test
     void addNew() {
         AdminAddNewDTO admin = new AdminAddNewDTO();
-        admin.setUsername("管理员001");
-        admin.setPassword("测试数据的简介");
-        admin.setPhone("13900139001");
-        admin.setEmail("13900139001@baidu.com");
+        admin.setUsername("管理员007");
+        admin.setPassword("123456");
+        admin.setPhone("13900139007");
+        admin.setEmail("13900139007@baidu.com");
 
         try {
             service.addNew(admin);

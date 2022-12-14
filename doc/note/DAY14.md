@@ -68,6 +68,40 @@ public JsonResult handleThrowable(Throwable e) {
 
 **注意：**以上代码中的`e.printStackTrace();`是耗时操作，可能导致线程阻塞，在许多项目中是禁止使用的，在项目上线之前，应该评估是否需要删除此行代码！
 
+## 关于Spring Security判断是否通过认证的标准
+
+在Spring Security框架中，有`SecurityContext`，它是用于持有各用户的认证信息的，即各用户成功登录后，需要将认证信息存入到`SecurityContext`中，后续，Spring Security框架会自动检查`SecurityContext`中的认证信息，如果某个用户在`SecurityContext`中没有匹配的认证信息，将被视为“未通过认证”（未登录）的状态。
+
+在项目的任何代码片段中，都可以通过`SecurityContextHolder`类的静态方法`getContext()`来获取`SecuriytContext`的引用，例如：
+
+```java
+SecurityContext securityContext = SecurityContextHolder.getContext();
+```
+
+在处理认证的过程中，当视为“已认证”时，需要将认证信息存入到`SecurityContext`中！目前，是通过`AuthenticationManager`对象的`authenticate()`方法执行认证的，此方法认证通过后，会返回`Authentication`对象，即认证信息，将它存入到`SecurityContext`中即可！
+
+则在`AdminServiceImpl`中的`login()`方法中进行调整：
+
+```java
+@Override
+public void login(AdminLoginDTO adminLoginDTO) {
+    log.debug("开始处理【管理员登录】的业务，参数：{}", adminLoginDTO);
+    // 执行认证
+    Authentication authentication = new UsernamePasswordAuthenticationToken(
+            adminLoginDTO.getUsername(), adminLoginDTO.getPassword());
+    
+    // ↓↓↓↓↓ 调整：获取方法的返回值
+    Authentication authenticateResult
+            = authenticationManager.authenticate(authentication);
+    log.debug("认证通过！");
+    
+	// ↓↓↓↓↓ 新增以下2行代码
+    // 将认证通过后得到的认证信息存入到SecurityContext中
+    SecurityContext securityContext = SecurityContextHolder.getContext();
+    securityContext.setAuthentication(authenticateResult);
+}
+```
+
 
 
 

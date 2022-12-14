@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -47,8 +49,13 @@ public class AdminServiceImpl implements IAdminService {
         // 执行认证
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 adminLoginDTO.getUsername(), adminLoginDTO.getPassword());
-        authenticationManager.authenticate(authentication);
+        Authentication authenticateResult
+                = authenticationManager.authenticate(authentication);
         log.debug("认证通过！");
+
+        // 将认证通过后得到的认证信息存入到SecurityContext中
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        securityContext.setAuthentication(authenticateResult);
     }
 
     @Override

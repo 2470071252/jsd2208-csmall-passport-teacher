@@ -82,13 +82,6 @@ public class GlobalExceptionHandler {
         return JsonResult.fail(ServiceCode.ERR_UNAUTHORIZED, message);
     }
 
-//    @ExceptionHandler
-//    public JsonResult handleBadCredentialsException(BadCredentialsException e) {
-//        log.debug("开始处理" + e.getClass().getName());
-//        String message = "登录失败，用户名或密码错误！";
-//        return JsonResult.fail(ServiceCode.ERR_UNAUTHORIZED, message);
-//    }
-
     @ExceptionHandler
     public JsonResult handleDisabledException(DisabledException e) {
         log.debug("开始处理DisabledException");

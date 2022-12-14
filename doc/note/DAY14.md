@@ -66,7 +66,7 @@ public JsonResult handleThrowable(Throwable e) {
 }
 ```
 
-
+**注意：**以上代码中的`e.printStackTrace();`是耗时操作，可能导致线程阻塞，在许多项目中是禁止使用的，在项目上线之前，应该评估是否需要删除此行代码！
 
 
 

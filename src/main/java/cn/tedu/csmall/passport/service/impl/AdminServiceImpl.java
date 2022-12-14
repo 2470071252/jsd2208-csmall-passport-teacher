@@ -52,6 +52,7 @@ public class AdminServiceImpl implements IAdminService {
         Authentication authenticateResult
                 = authenticationManager.authenticate(authentication);
         log.debug("认证通过！");
+        log.debug("认证结果：{}", authenticateResult); // 注意：此认证结果中的Principal就是UserDetailsServiceImpl中返回的UserDetails对象
 
         // 将认证通过后得到的认证信息存入到SecurityContext中
         SecurityContext securityContext = SecurityContextHolder.getContext();

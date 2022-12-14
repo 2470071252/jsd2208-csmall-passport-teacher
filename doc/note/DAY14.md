@@ -206,11 +206,54 @@ log.debug("即将向Spring Security返回UserDetails对象：{}", userDetails);
 org.springframework.security.core.userdetails.User [Username=root, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, credentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[/ams/admin/add-new, /ams/admin/delete, /ams/admin/read, /ams/admin/update, /pms/album/add-new, /pms/album/delete, /pms/album/read, /pms/album/update, /pms/brand/add-new, /pms/brand/delete, /pms/brand/read, /pms/brand/update, /pms/category/add-new, /pms/category/delete, /pms/category/read, /pms/category/update, /pms/picture/add-new, /pms/picture/delete, /pms/picture/read, /pms/picture/update, /pms/product/add-new, /pms/product/delete, /pms/product/read, /pms/product/update]]
 ```
 
+**注意：**在`AdminServiceImpl`处理登录时，调用的`AuthenticationManager`对象的`authenticate()`方法会返回认证结果，而认证结果中的`Principal`就是`UserDetailsServiceImpl`中返回的`UserDetails`对象！所以，认证结果中是包含权限列表的，在其后，将整个认证结果存入到了`SecurityContext`中（`securityContext.setAuthentication(authenticateResult);`），所以，在`SecurityContext`中是包含了通过认证的账号的权限列表的！
 
+接下来，可以通过Spring Security框架来检查登录的用户是否具有权限发起某些请求！
 
+先在`SecurityConfiguration`类上添加注解，以启用方法级别的安全检查（即权限检查）：
 
+```java
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+```
 
+然后，在需要检查权限的方法上，使用`@PreAuthroize`注解来配置权限规则，例如在`AdminController`中处理“删除管理员”的请求的方法上配置权限规则：
 
+```java
+@PreAuthorize("hasAuthority('/ams/admin/delete')") // 新增
+@PostMapping("/{id:[0-9]+}/delete")
+public JsonResult delete(@PathVariable Long id) {
+    // 暂不关心
+}
+```
+
+后续，当Spring Security检查到用户无此权限时，将抛出异常，例如：
+
+```
+org.springframework.security.access.AccessDeniedException: 不允许访问
+```
+
+所以，应该在`ServiceCode`中添加新的业务状态码：
+
+```java
+/**
+ * 错误：权限不足
+ */
+ERR_FORBIDDEN(40300),
+```
+
+并且，在`GlobalExceptionHandler`中添加处理以上异常的方法（注意：不要导包错误）：
+
+```java
+@ExceptionHandler
+public JsonResult handleAccessDeniedException(AccessDeniedException e) {
+    log.debug("开始处理AccessDeniedException");
+    log.debug("异常消息：" + e.getMessage());
+    String message = "权限不足，禁止访问！";
+    return JsonResult.fail(ServiceCode.ERR_FORBIDDEN, message);
+}
+```
+
+完成后，启用项目，在数据表中的数据都是初始测试数据的情况下，使用`root`账号登录，可以删除管理员，使用其它账号登录，将因为权限不足而无法执行删除管理员操作。
 
 
 

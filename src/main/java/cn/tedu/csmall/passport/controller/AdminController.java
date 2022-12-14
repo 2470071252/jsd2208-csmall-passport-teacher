@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,6 +48,7 @@ public class AdminController {
     // http://localhost:9081/admins/add-new
     @ApiOperation("添加管理员")
     @ApiOperationSupport(order = 100)
+    @PreAuthorize("hasAuthority('/ams/admin/add-new')")
     @PostMapping("/add-new")
     public JsonResult addNew(AdminAddNewDTO adminAddNewDTO) {
         log.debug("开始处理【添加管理员】的请求，参数：{}", adminAddNewDTO);
@@ -58,6 +60,7 @@ public class AdminController {
     @ApiOperation("根据id删除删除管理员")
     @ApiOperationSupport(order = 200)
     @ApiImplicitParam(name = "id", value = "管理员ID", required = true, dataType = "long")
+    @PreAuthorize("hasAuthority('/ams/admin/delete')")
     @PostMapping("/{id:[0-9]+}/delete")
     public JsonResult delete(@PathVariable Long id) {
         log.debug("开始处理【根据id删除删除管理员】的请求，参数：{}", id);

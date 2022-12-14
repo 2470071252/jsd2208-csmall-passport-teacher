@@ -97,4 +97,12 @@ public class GlobalExceptionHandler {
         return JsonResult.fail(ServiceCode.ERR_UNAUTHORIZED_DISABLED, message);
     }
 
+    @ExceptionHandler
+    public JsonResult handleThrowable(Throwable e) {
+        log.debug("开始处理Throwable");
+        e.printStackTrace();
+        String message = "服务器忙，请稍后再尝试（开发阶段，请检查服务器端控制台）！";
+        return JsonResult.fail(ServiceCode.ERR_UNKNOWN, message);
+    }
+
 }

@@ -53,7 +53,18 @@ public JsonResult handleAuthenticationException(AuthenticationException e) {
 }
 ```
 
+另外，建议在全局异常处理器中，添加对`Throwable`异常的处理，避免向客户端响应`500`错误，例如：
 
+```java
+@ExceptionHandler
+public JsonResult handleThrowable(Throwable e) {
+    log.debug("开始处理Throwable");
+    e.printStackTrace();
+    String message = "服务器忙，请稍后再尝试（开发阶段，请检查服务器端控制台）！";
+    // 需要先在ServiceCode中补充新的业务状态码ERR_UNKNOWN，值应该使用比较特殊的
+    return JsonResult.fail(ServiceCode.ERR_UNKNOWN, message); 
+}
+```
 
 
 

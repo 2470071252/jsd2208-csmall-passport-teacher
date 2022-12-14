@@ -31,7 +31,11 @@ public enum ServiceCode {
     /**
      * 错误：数据冲突
      */
-    ERR_CONFLICT(40900);
+    ERR_CONFLICT(40900),
+    /**
+     * 错误：未知错误
+     */
+    ERR_UNKNOWN(99999);
 
     private Integer value;
 

@@ -20,8 +20,8 @@ public class AdminServiceTests {
     @Test
     void login() {
         AdminLoginDTO adminLoginDTO = new AdminLoginDTO();
-        adminLoginDTO.setUsername("wangkejing");
-        adminLoginDTO.setPassword("123456");
+        adminLoginDTO.setUsername("wangkejingzzz");
+        adminLoginDTO.setPassword("123456zzz");
 
         try {
             service.login(adminLoginDTO);

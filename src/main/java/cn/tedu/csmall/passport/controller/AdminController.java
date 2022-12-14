@@ -37,7 +37,7 @@ public class AdminController {
     // http://localhost:9081/admins/login
     @ApiOperation("管理员登录")
     @ApiOperationSupport(order = 50)
-    @RequestMapping("/login")
+    @PostMapping("/login")
     public JsonResult login(AdminLoginDTO adminLoginDTO) {
         log.debug("开始处理【管理员登录】的请求，参数：{}", adminLoginDTO);
         adminService.login(adminLoginDTO);

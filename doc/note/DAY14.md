@@ -257,9 +257,38 @@ public JsonResult handleAccessDeniedException(AccessDeniedException e) {
 
 ## 认证处理流程
 
-![image-20221214162329639](images/image-20221214162329639.png)
+![image-20221214163344258](images/image-20221214163344258.png)
 
+## 识别当前登录的账号
 
+在认证信息（`Authentication`）中包含`Principal`属性，目前，此属性就是`UserDetailsServiceImpl`返回的`UserDetails`对象。
+
+Principal：当事人
+
+在处理请求的方法的参数列表中，可以添加当事人类型的参数，并在此参数上添加`@AuthenticationPrincipal`注解，则Spring Security框架就会为此参数注入值，例如：
+
+```java
+@PostMapping("/{id:[0-9]+}/delete")
+public JsonResult delete(@PathVariable Long id,
+                         // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 新增参数 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+                         @AuthenticationPrincipal UserDetails userDetails) {
+    log.debug("开始处理【根据id删除删除管理员】的请求，参数：{}", id);
+    log.debug("当事人：{}", userDetails);
+    log.debug("当事人的用户名：{}", userDetails.getUsername());
+    adminService.delete(id);
+    return JsonResult.ok();
+}
+```
+
+当事人的信息输出如下所示：
+
+```
+2022-12-14 16:43:26.177 DEBUG 16240 --- [nio-9081-exec-2] c.t.c.p.controller.AdminController       : 当事人：org.springframework.security.core.userdetails.User [Username=root, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, credentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[/ams/admin/add-new, /ams/admin/delete, /ams/admin/read, /ams/admin/update, /pms/album/add-new, /pms/album/delete, /pms/album/read, /pms/album/update, /pms/brand/add-new, /pms/brand/delete, /pms/brand/read, /pms/brand/update, /pms/category/add-new, /pms/category/delete, /pms/category/read, /pms/category/update, /pms/picture/add-new, /pms/picture/delete, /pms/picture/read, /pms/picture/update, /pms/product/add-new, /pms/product/delete, /pms/product/read, /pms/product/update]]
+```
+
+**注意：**当处理请求的方法添加了新的参数后，API文档默认视为此参数是由客户端提交的，实际上此参数是由Spring Security框架注入值的，所以，为了避免API文档错误显示，应该在此参数上补充添加`@ApiIgnore`注解，例如声明为`@ApiIgnore @AuthenticationPrincipal UserDetails userDetails`。
+
+## 登录信息中应该包括id或其它扩展信息
 
 
 

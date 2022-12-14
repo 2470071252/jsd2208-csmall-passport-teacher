@@ -12,7 +12,10 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -62,8 +65,11 @@ public class AdminController {
     @ApiImplicitParam(name = "id", value = "管理员ID", required = true, dataType = "long")
     @PreAuthorize("hasAuthority('/ams/admin/delete')")
     @PostMapping("/{id:[0-9]+}/delete")
-    public JsonResult delete(@PathVariable Long id) {
+    public JsonResult delete(@PathVariable Long id,
+                             @ApiIgnore @AuthenticationPrincipal UserDetails userDetails) {
         log.debug("开始处理【根据id删除删除管理员】的请求，参数：{}", id);
+        log.debug("当事人：{}", userDetails);
+        log.debug("当事人的用户名：{}", userDetails.getUsername());
         adminService.delete(id);
         return JsonResult.ok();
     }

@@ -290,7 +290,43 @@ public JsonResult delete(@PathVariable Long id,
 
 ## 登录信息中应该包括id或其它扩展信息
 
+**提示：**在认证信息（`Authentication`）中包含`Principal`属性，目前，此属性就是`UserDetailsServiceImpl`返回的`UserDetails`对象。
 
+所以，可以自定义类，实现`UserDetails`接口，或继承自`User`（此类是`UserDetails`接口的实现类），然后，在`UserDetailsServiceImpl`中返回自定义类的对象，则认证信息中的`Principal`就是自定义类的对象！
+
+则在根包下创建`security.AdminDetails`继承自`User`类，以扩展出`id`属性：
+
+```java
+@Getter
+@EqualsAndHashCode
+@ToString(callSuper = true)
+public class AdminDetails extends User {
+
+    /**
+     * 管理员ID
+     */
+    private Long id;
+
+    public AdminDetails(Long id, String username, String password,
+                        boolean enabled, Collection<? extends GrantedAuthority> authorities) {
+        super(username, password, enabled, true, true, true, authorities);
+        this.id = id;
+    }
+
+}
+```
+
+接下来，应该在`UserDetailsServiceImpl`中返回`AdminDetails`类型的对象：
+
+```java
+
+```
+
+后续，当需要获取当事人信息时，改为注入`AdminDetails`类型的对象即可：
+
+```java
+
+```
 
 
 

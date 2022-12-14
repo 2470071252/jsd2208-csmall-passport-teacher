@@ -329,13 +329,52 @@ public class AdminDetails extends User {
 接下来，应该在`UserDetailsServiceImpl`中返回`AdminDetails`类型的对象：
 
 ```java
+@Override
+public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+    log.debug("Spring Security调用了loadUserByUsername()方法，参数：{}", s);
 
+    AdminLoginInfoVO loginInfo = adminMapper.getLoginInfoByUsername(s);
+    log.debug("从数据库查询用户名【{}】匹配的信息，结果：{}", s, loginInfo);
+
+    if (loginInfo == null) {
+        return null; // 暂时
+    }
+
+    // 创建权限列表
+    // AdminDetails的构造方法要求是Collection<? extends GrantedAuthority>类型的
+    // 在Mapper查询结果中的权限是List<String>类型的，所以需要遍历再创建得到所需的权限列表
+    List<String> permissions = loginInfo.getPermissions();
+    List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+    for (String permission : permissions) {
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(permission);
+        authorities.add(authority);
+    }
+
+    // 创建AdminDetails类型的对象
+    // 此类型是基于User类型扩展的，可以有自定义属性，例如id
+    AdminDetails adminDetails = new AdminDetails(
+            loginInfo.getId(), loginInfo.getUsername(), loginInfo.getPassword(),
+            loginInfo.getEnable() == 1, authorities);
+
+    log.debug("即将向Spring Security返回UserDetails对象：{}", adminDetails);
+    return adminDetails;
+}
 ```
 
 后续，当需要获取当事人信息时，改为注入`AdminDetails`类型的对象即可：
 
 ```java
-
+@PostMapping("/{id:[0-9]+}/delete")
+public JsonResult delete(@PathVariable Long id,
+                         //                                  ↓↓↓↓↓ 声明成自定义类型
+                         @ApiIgnore @AuthenticationPrincipal AdminDetails adminDetails) {
+    log.debug("开始处理【根据id删除删除管理员】的请求，参数：{}", id);
+    log.debug("当事人：{}", adminDetails);
+    log.debug("当事人的ID：{}", adminDetails.getId()); // 获取扩展的属性
+    log.debug("当事人的用户名：{}", adminDetails.getUsername());
+    adminService.delete(id);
+    return JsonResult.ok();
+}
 ```
 
 

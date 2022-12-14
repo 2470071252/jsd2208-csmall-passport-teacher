@@ -3,6 +3,7 @@ package cn.tedu.csmall.passport.controller;
 import cn.tedu.csmall.passport.pojo.dto.AdminAddNewDTO;
 import cn.tedu.csmall.passport.pojo.dto.AdminLoginDTO;
 import cn.tedu.csmall.passport.pojo.vo.AdminListItemVO;
+import cn.tedu.csmall.passport.security.AdminDetails;
 import cn.tedu.csmall.passport.service.IAdminService;
 import cn.tedu.csmall.passport.web.JsonResult;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
@@ -13,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -66,10 +66,11 @@ public class AdminController {
     @PreAuthorize("hasAuthority('/ams/admin/delete')")
     @PostMapping("/{id:[0-9]+}/delete")
     public JsonResult delete(@PathVariable Long id,
-                             @ApiIgnore @AuthenticationPrincipal UserDetails userDetails) {
+                             @ApiIgnore @AuthenticationPrincipal AdminDetails adminDetails) {
         log.debug("开始处理【根据id删除删除管理员】的请求，参数：{}", id);
-        log.debug("当事人：{}", userDetails);
-        log.debug("当事人的用户名：{}", userDetails.getUsername());
+        log.debug("当事人：{}", adminDetails);
+        log.debug("当事人的ID：{}", adminDetails.getId());
+        log.debug("当事人的用户名：{}", adminDetails.getUsername());
         adminService.delete(id);
         return JsonResult.ok();
     }

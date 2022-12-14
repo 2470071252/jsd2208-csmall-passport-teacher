@@ -18,8 +18,8 @@ public class AdminDetails extends User {
      */
     private Long id;
 
-    public AdminDetails(Long id, String username, String password,
-                        boolean enabled, Collection<? extends GrantedAuthority> authorities) {
+    public AdminDetails(Long id, String username, String password, boolean enabled,
+                        Collection<? extends GrantedAuthority> authorities) {
         super(username, password, enabled, true, true, true, authorities);
         this.id = id;
     }

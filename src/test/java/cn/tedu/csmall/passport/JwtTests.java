@@ -12,14 +12,15 @@ import java.util.Map;
 public class JwtTests {
 
     // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZSI6IjEzODAwMTM4MDAxIiwiaWQiOjk1MjcsImV4cCI6MTY3MTA5NDExNywidXNlcm5hbWUiOiJ0ZXN0LWp3dCJ9.p5gQ6fg-mgAvDF3LllRBHwmnqkTVbHAAM8fDsMTIHuA
+    // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZSI6IjEzODAwMTM4MDAxIiwiaWQiOjk1MjcsImV4cCI6MTY3MTA5NTI3MiwidXNlcm5hbWUiOiJ0ZXN0LWp3dCJ9.9aHPOE-JLjCqd9sKEehoZzqGhz7hpsYcUwIzpiVdfmg
+
+    // 是一个自定义的字符串，应该是一个保密数据，最低要求不少于4个字符，但推荐使用更加复杂的字符串
+    String secretKey = "fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou";
 
     @Test
     void generate() {
         // JWT的过期时间
         Date date = new Date(System.currentTimeMillis() + 5 * 60 * 1000);
-
-        // 是一个自定义的字符串，应该是一个保密数据，最低要求不少于4个字符，但推荐使用更加复杂的字符串
-        String secretKey = "fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou";
 
         // 你要存入到JWT中的数据
         Map<String, Object> claims = new HashMap<>();
@@ -39,6 +40,26 @@ public class JwtTests {
                 // 完成
                 .compact(); // 得到JWT数据
         System.out.println(jwt);
+    }
+
+    @Test
+    void parse() {
+        // 需要被解析的JWT，在复制此数据时，切记不要多复制了换行符（\n）
+        String jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZSI6IjEzODAwMTM4MDAxIiwiaWQiOjk1MjcsImV4cCI6MTY3MTA5NTI3MiwidXNlcm5hbWUiOiJ0ZXN0LWp3dCJ9.9aHPOE-JLjCqd9sKEehoZzqGhz7hpsYcUwIzpiVdfmg";
+
+        // 执行解析
+        Claims claims = Jwts.parser() // 获得JWT解析工具
+                .setSigningKey(secretKey)
+                .parseClaimsJws(jwt)
+                .getBody();
+
+        // 从Claims中获取生成时存入的数据
+        Object id = claims.get("id");
+        Object username = claims.get("username");
+        Object phone = claims.get("phone");
+        System.out.println("id = " + id);
+        System.out.println("username = " + username);
+        System.out.println("phone = " + phone);
     }
 
 }

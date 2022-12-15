@@ -203,7 +203,7 @@ Token是典型的解决集群系统甚至分布式系统中识别用户身份的
 
 **JWT**：**J**son **W**eb **T**oken
 
-Token上可能需要记录用户身份的多项数据，例如`id`、`username`，这些数据应该被有效的组织起来，使用JWT时，这些数据是使用JSON格式组织起来的
+Token上可能需要记录用户身份的多项数据，例如`id`、`username`等，这些数据应该被有效的组织起来，以至于后续服务器端能够验证真伪，并解析出其中的数据，使用JWT时，这些数据是使用JSON格式组织起来的。
 
 关于JWT的使用，有一套固定的标准，它约定了JWT数据的组成部分，必须包含：
 
@@ -212,6 +212,19 @@ Token上可能需要记录用户身份的多项数据，例如`id`、`username`�
 - 数据签名（Signature）
 
 具体可参见：https://jwt.io/
+
+# 使用JWT
+
+首先，需要添加相关的依赖项，推荐的依赖项有：
+
+```xml
+<!-- JJWT（Java JWT） -->
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt</artifactId>
+    <version>0.9.1</version>
+</dependency>
+```
 
 
 

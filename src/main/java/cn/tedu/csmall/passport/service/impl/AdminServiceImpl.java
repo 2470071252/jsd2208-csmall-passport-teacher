@@ -21,7 +21,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -64,7 +63,6 @@ public class AdminServiceImpl implements IAdminService {
         securityContext.setAuthentication(authenticateResult);
     }
 
-    //@Transactional
     @Override
     public void addNew(AdminAddNewDTO adminAddNewDTO) {
         log.debug("开始处理【添加管理员】的业务，参数：{}", adminAddNewDTO);
@@ -124,7 +122,7 @@ public class AdminServiceImpl implements IAdminService {
         adminMapper.insert(admin);
 
         if (admin != null) { // 临时随便设置的条件，保证一定满足此条件即可
-            throw new RuntimeException();
+            throw new NullPointerException();
         }
 
         // 准备批量插入管理员与角色的关联数据

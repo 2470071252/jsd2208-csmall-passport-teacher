@@ -157,11 +157,71 @@ if (rows != roleIds.length) {
 
 **提示：**关于“根据管理员id删除关联表中的数据”的Mapper层功能，此前已经完成。
 
-则调整`AdminServiceImpl`中`delete()`方法的实现：
+则调整`AdminServiceImpl`中`delete()`方法的实现（需要提前在`ServiceCode`中添加对应的业务状态码的枚举）：
 
 ```java
+// 执行删除--管理员表
+log.debug("即将执行删除数据，参数：{}", id);
+int rows = adminMapper.deleteById(id);
+if (rows != 1) {
+    String message = "删除管理员失败，服务器忙，请稍后再尝试！";
+    log.warn(message);
+    throw new ServiceException(ServiceCode.ERR_DELETE, message);
+}
 
+// 执行删除--管理员与角色的关联表
+rows = adminRoleMapper.deleteByAdminId(id);
+if (rows < 1) {
+    String message = "删除管理员失败，服务器忙，请稍后再尝试！";
+    log.warn(message);
+    throw new ServiceException(ServiceCode.ERR_DELETE, message);
+}
 ```
+
+# 关于Session的弊端
+
+使用Session保存用户状态，存在几个问题：
+
+- Session必须设置一个较短的有效期（通常不会超过半小时），超时将删除对应的Session数据，以缓存内存的压力
+  - 此问题对于Session机制几乎无解
+- Session是保存在服务器端内存中的数据，默认不支持集群项目
+  - 此问题可以通过技术解决，例如使用共享Session
+
+# 关于Token
+
+Token：票据；令牌。也就是身份的凭证。
+
+Token机制的典型表现：当用户成功登录后，服务器端会生成并响应一个Token到客户端，此Token上记录了用户的身份信息，此后，客户端在每次请求时都携带Token到服务器端，服务器端会先验证Token的真伪，当Token有效时，就可以根据Token上记录的信息来识别用户的身份。
+
+Token是典型的解决集群系统甚至分布式系统中识别用户身份的解决方案。
+
+由于Token本身并不占用服务器端的内存空间，所以，可以长时间的表示用户的身份，例如10天、15天甚至更久，这是Session机制无法解决的问题。
+
+对于服务器端而言，主要解决几个问题：生成Token、验证Token真伪、解析Token。
+
+# 关于JWT
+
+**JWT**：**J**son **W**eb **T**oken
+
+Token上可能需要记录用户身份的多项数据，例如`id`、`username`，这些数据应该被有效的组织起来，使用JWT时，这些数据是使用JSON格式组织起来的
+
+关于JWT的使用，有一套固定的标准，它约定了JWT数据的组成部分，必须包含：
+
+- 头部信息（Header）
+- 载荷（Payload）：数据
+- 数据签名（Signature）
+
+具体可参见：https://jwt.io/
+
+
+
+
+
+
+
+
+
+
 
 
 

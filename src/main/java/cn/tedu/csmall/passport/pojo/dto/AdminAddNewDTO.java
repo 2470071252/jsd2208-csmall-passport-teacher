@@ -3,7 +3,6 @@ package cn.tedu.csmall.passport.pojo.dto;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * 添加管理员的DTO类

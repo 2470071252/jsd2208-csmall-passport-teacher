@@ -52,7 +52,7 @@ public class AdminServiceTests {
 
     @Test
     void delete() {
-        Long id = 2L;
+        Long id = 7L;
 
         try {
             service.delete(id);

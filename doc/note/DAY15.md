@@ -122,6 +122,57 @@ try {
   - 在学习阶段，推荐在业务接口上添加此注解，避免遗漏
 - 在实现业务的过程中，当视为“失败”时，应该抛出`RuntimeException`或其子孙类异常，使得事务管理机制执行回滚
 
+基于以上原则，关于“添加管理员”，应该在`ServiceCode`中补充新的业务状态码：
+
+```java
+/**
+ * 错误：插入数据错误
+ */
+ERR_INSERT(50000),
+```
+
+并在，在处理业务时，当执行插入数据操作时，应该及时获取“受影响的行数”，并判断此值是否符合预期值，当不受影响的行数不符合预期值时，应该抛出异常，例如：
+
+```java
+int rows = adminMapper.insert(admin);
+if (rows != 1) {
+    String message = "添加管理员失败，服务器忙，请稍后再尝试！";
+    log.warn(message);
+    throw new ServiceException(ServiceCode.ERR_INSERT, message);
+}
+```
+
+```java
+rows = adminRoleMapper.insertBatch(adminRoleList);
+if (rows != roleIds.length) {
+    String message = "添加管理员失败，服务器忙，请稍后再尝试！";
+    log.warn(message);
+    throw new ServiceException(ServiceCode.ERR_INSERT, message);
+}
+```
+
+# 调整“删除管理员”的业务
+
+由于添加管理员时向`ams_admin`和`ams_admin_role`这2张表中都插入了数据，那么，当删除管理员时，也应该同时删除这2张表中的相关数据！
+
+**提示：**关于“根据管理员id删除关联表中的数据”的Mapper层功能，此前已经完成。
+
+则调整`AdminServiceImpl`中`delete()`方法的实现：
+
+```java
+
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 

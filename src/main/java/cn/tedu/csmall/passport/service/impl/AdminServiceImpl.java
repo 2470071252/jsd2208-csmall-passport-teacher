@@ -155,9 +155,22 @@ public class AdminServiceImpl implements IAdminService {
             throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
         }
 
-        // 执行删除
+        // 执行删除--管理员表
         log.debug("即将执行删除数据，参数：{}", id);
-        adminMapper.deleteById(id);
+        int rows = adminMapper.deleteById(id);
+        if (rows != 1) {
+            String message = "删除管理员失败，服务器忙，请稍后再尝试！";
+            log.warn(message);
+            throw new ServiceException(ServiceCode.ERR_DELETE, message);
+        }
+
+        // 执行删除--管理员与角色的关联表
+        rows = adminRoleMapper.deleteByAdminId(id);
+        if (rows < 1) {
+            String message = "删除管理员失败，服务器忙，请稍后再尝试！";
+            log.warn(message);
+            throw new ServiceException(ServiceCode.ERR_DELETE, message);
+        }
     }
 
     @Override

@@ -37,6 +37,22 @@ public enum ServiceCode {
      */
     ERR_CONFLICT(40900),
     /**
+     * 错误：插入数据错误
+     */
+    ERR_INSERT(50000),
+    /**
+     * 错误：删除数据错误
+     */
+    ERR_DELETE(50010),
+    /**
+     * 错误：修改数据错误
+     */
+    ERR_UPDATE(50020),
+    /**
+     * 错误：查询数据错误
+     */
+    ERR_SELECT(50030),
+    /**
      * 错误：未知错误
      */
     ERR_UNKNOWN(99999);

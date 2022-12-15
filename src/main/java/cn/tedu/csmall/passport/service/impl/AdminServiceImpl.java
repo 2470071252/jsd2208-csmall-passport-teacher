@@ -119,10 +119,11 @@ public class AdminServiceImpl implements IAdminService {
         // 设置初始登录次数
         admin.setLoginCount(0);
         // 调用adminMapper.insert()方法插入管理员数据
-        adminMapper.insert(admin);
-
-        if (admin != null) { // 临时随便设置的条件，保证一定满足此条件即可
-            throw new NullPointerException();
+        int rows = adminMapper.insert(admin);
+        if (rows != 1) {
+            String message = "添加管理员失败，服务器忙，请稍后再尝试！";
+            log.warn(message);
+            throw new ServiceException(ServiceCode.ERR_INSERT, message);
         }
 
         // 准备批量插入管理员与角色的关联数据
@@ -135,7 +136,12 @@ public class AdminServiceImpl implements IAdminService {
             adminRole.setRoleId(roleIds[i]);
             adminRoleList[i] = adminRole;
         }
-        adminRoleMapper.insertBatch(adminRoleList);
+        rows = adminRoleMapper.insertBatch(adminRoleList);
+        if (rows != roleIds.length) {
+            String message = "添加管理员失败，服务器忙，请稍后再尝试！";
+            log.warn(message);
+            throw new ServiceException(ServiceCode.ERR_INSERT, message);
+        }
     }
 
     @Override

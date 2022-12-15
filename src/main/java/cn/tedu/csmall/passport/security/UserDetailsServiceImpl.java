@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,9 +37,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         // AdminDetails的构造方法要求是Collection<? extends GrantedAuthority>类型的
         // 在Mapper查询结果中的权限是List<String>类型的，所以需要遍历再创建得到所需的权限列表
         List<String> permissions = loginInfo.getPermissions();
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
         for (String permission : permissions) {
-            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(permission);
+            GrantedAuthority authority = new SimpleGrantedAuthority(permission);
             authorities.add(authority);
         }
 

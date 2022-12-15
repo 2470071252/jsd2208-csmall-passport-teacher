@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.9</version>
+        <version>2.5.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -68,18 +68,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <!-- 构建项目的配置 -->
-    <build>
-        <!-- 构建项目的插件 -->
-        <plugins>
-            <!-- Spring Boot的构建插件 -->
-            <!-- 注意：如果此项出错，可以直接删除，在除了打包以外不会受到影响 -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

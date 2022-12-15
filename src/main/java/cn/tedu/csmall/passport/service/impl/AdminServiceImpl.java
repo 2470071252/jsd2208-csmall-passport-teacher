@@ -2,9 +2,11 @@ package cn.tedu.csmall.passport.service.impl;
 
 import cn.tedu.csmall.passport.ex.ServiceException;
 import cn.tedu.csmall.passport.mapper.AdminMapper;
+import cn.tedu.csmall.passport.mapper.AdminRoleMapper;
 import cn.tedu.csmall.passport.pojo.dto.AdminAddNewDTO;
 import cn.tedu.csmall.passport.pojo.dto.AdminLoginDTO;
 import cn.tedu.csmall.passport.pojo.entity.Admin;
+import cn.tedu.csmall.passport.pojo.entity.AdminRole;
 import cn.tedu.csmall.passport.pojo.vo.AdminListItemVO;
 import cn.tedu.csmall.passport.pojo.vo.AdminStandardVO;
 import cn.tedu.csmall.passport.service.IAdminService;
@@ -34,6 +36,8 @@ public class AdminServiceImpl implements IAdminService {
 
     @Autowired
     private AdminMapper adminMapper;
+    @Autowired
+    private AdminRoleMapper adminRoleMapper;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -116,6 +120,18 @@ public class AdminServiceImpl implements IAdminService {
         admin.setLoginCount(0);
         // 调用adminMapper.insert()方法插入管理员数据
         adminMapper.insert(admin);
+
+        // 准备批量插入管理员与角色的关联数据
+        Long adminId = admin.getId();
+        Long[] roleIds = adminAddNewDTO.getRoleIds();
+        AdminRole[] adminRoleList = new AdminRole[roleIds.length];
+        for (int i = 0; i < roleIds.length; i++) {
+            AdminRole adminRole = new AdminRole();
+            adminRole.setAdminId(adminId);
+            adminRole.setRoleId(roleIds[i]);
+            adminRoleList[i] = adminRole;
+        }
+        adminRoleMapper.insertBatch(adminRoleList);
     }
 
     @Override

@@ -226,11 +226,200 @@ Token上可能需要记录用户身份的多项数据，例如`id`、`username`�
 </dependency>
 ```
 
+生成JWT和解析JWT的示例（测试）代码如下：
 
+```java
+package cn.tedu.csmall.passport;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.junit.jupiter.api.Test;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+public class JwtTests {
+    
+    // 是一个自定义的字符串，应该是一个保密数据，最低要求不少于4个字符，但推荐使用更加复杂的字符串
+    String secretKey = "fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou";
 
+    @Test
+    void generate() {
+        // JWT的过期时间
+        Date date = new Date(System.currentTimeMillis() + 5 * 60 * 1000);
+
+        // 你要存入到JWT中的数据
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", 9527);
+        claims.put("username", "test-jwt");
+        claims.put("phone", "13800138001");
+
+        String jwt = Jwts.builder() // 获取JwtBuilder，准备构建JWT数据
+                // 【1】Header：主要配置alg（algorithm：算法）和typ（type：类型）属性
+                .setHeaderParam("alg", "HS256")
+                .setHeaderParam("typ", "JWT")
+                // 【2】Payload：主要配置Claims，把你要存入的数据放进去
+                .setClaims(claims)
+                // 【3】Signature：主要配置JWT的过期时间、签名的算法和secretKey
+                .setExpiration(date)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                // 完成
+                .compact(); // 得到JWT数据
+        System.out.println(jwt);
+    }
+
+    @Test
+    void parse() {
+        // 需要被解析的JWT，在复制此数据时，切记不要多复制了换行符（\n）
+        String jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZSI6IjEzODAwMTM4MDAxIiwiaWQiOjk1MjcsImV4cCI6MTY3MTA5NTI3MiwidXNlcm5hbWUiOiJ0ZXN0LWp3dCJ9.9aHPOE-JLjCqd9sKEehoZzqGhz7hpsYcUwIzpiVdfmg";
+
+        // 执行解析
+        Claims claims = Jwts.parser() // 获得JWT解析工具
+                .setSigningKey(secretKey)
+                .parseClaimsJws(jwt)
+                .getBody();
+
+        // 从Claims中获取生成时存入的数据
+        Object id = claims.get("id");
+        Object username = claims.get("username");
+        Object phone = claims.get("phone");
+        System.out.println("id = " + id);
+        System.out.println("username = " + username);
+        System.out.println("phone = " + phone);
+    }
+
+}
+```
+
+当尝试解析JWT时，如果JWT已经过期，则会出现`io.jsonwebtoken.ExpiredJwtException`：
+
+```
+io.jsonwebtoken.ExpiredJwtException: JWT expired at 2022-12-15T17:07:52Z. Current time: 2022-12-15T17:25:22Z, a difference of 1050481 milliseconds.  Allowed clock skew: 0 milliseconds.
+```
+
+当尝试解析JWT时，如果验证签名失败，则会出现`io.jsonwebtoken.SignatureException`：
+
+```
+io.jsonwebtoken.SignatureException: JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.
+```
+
+当尝试解析JWT时，如果因为JWT数据有误导致解析失败，则会出现`io.jsonwebtoken.MalformedJwtException`：
+
+```
+io.jsonwebtoken.MalformedJwtException: Unable to read JSON value: {"phone":"13800138001","id":9527,"exp":16%rname":"test-jwt"}
+```
+
+**注意：**不要在JWT中存入敏感信息，或核心数据，在不知道`secretKey`的情况下，依然可以根据JWT解析出相关数据，只是签名验证失败而已！例如，你可以将生成好的JWT粘贴到JWT官网上，可以看到JWT将解析出`Claims`中的信息，但是，会提示验证签名失败！所以，对于验证签名失败的JWT应该视为“错误的”，或“不可信任的”。
+
+# 登录成功后响应JWT
+
+首先，需要修改`IAdminService`中`login()`方法的返回值类型，由`void`改为`String`，表示认证通过后将返回JWT数据：
+
+```java
+/**
+ * 管理员登录
+ *
+ * @param adminLoginDTO 封装了登录参数的对象
+ * @return 管理员登录成功后将得到的JWT
+ */
+String login(AdminLoginDTO adminLoginDTO);
+```
+
+并且，修改`AdminServiceImpl`中重写的方法：
+
+```java
+@Override
+public String login(AdminLoginDTO adminLoginDTO) {
+    log.debug("开始处理【管理员登录】的业务，参数：{}", adminLoginDTO);
+    // 执行认证
+    Authentication authentication = new UsernamePasswordAuthenticationToken(
+            adminLoginDTO.getUsername(), adminLoginDTO.getPassword());
+    Authentication authenticateResult
+            = authenticationManager.authenticate(authentication);
+    log.debug("认证通过！");
+    log.debug("认证结果：{}", authenticateResult); // 注意：此认证结果中的Principal就是UserDetailsServiceImpl中返回的UserDetails对象
+
+    // 从认证结果中取出将要存入到JWT中的数据
+    Object principal = authenticateResult.getPrincipal();
+    AdminDetails adminDetails = (AdminDetails) principal;
+    Long id = adminDetails.getId();
+    String username = adminDetails.getUsername();
+
+    // 将认证通过后得到的认证信息存入到SecurityContext中
+    // 【注意】注释以下2行代码后，在未完成JWT验证流程之前，用户的登录将不可用
+    // SecurityContext securityContext = SecurityContextHolder.getContext();
+    // securityContext.setAuthentication(authenticateResult);
+
+    // ===== 生成并返回JWT =====
+    // 是一个自定义的字符串，应该是一个保密数据，最低要求不少于4个字符，但推荐使用更加复杂的字符串
+    String secretKey = "fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou";
+    // JWT的过期时间
+    Date date = new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000);
+    // 你要存入到JWT中的数据
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("id", id);
+    claims.put("username", username);
+    // claims.put("权限", "???"); // TODO 待处理
+    String jwt = Jwts.builder() // 获取JwtBuilder，准备构建JWT数据
+            // 【1】Header：主要配置alg（algorithm：算法）和typ（type：类型）属性
+            .setHeaderParam("alg", "HS256")
+            .setHeaderParam("typ", "JWT")
+            // 【2】Payload：主要配置Claims，把你要存入的数据放进去
+            .setClaims(claims)
+            // 【3】Signature：主要配置JWT的过期时间、签名的算法和secretKey
+            .setExpiration(date)
+            .signWith(SignatureAlgorithm.HS256, secretKey)
+            // 完成
+            .compact(); // 得到JWT数据
+    log.debug("即将返回JWT数据：{}", jwt);
+    return jwt;
+}
+```
+
+完成后，可以在`AdminServiceTests`中测试，当登录成功后，在日志中可以看到JWT数据：
+
+```java
+@Test
+void login() {
+    AdminLoginDTO adminLoginDTO = new AdminLoginDTO();
+    adminLoginDTO.setUsername("liucangsong");
+    adminLoginDTO.setPassword("123456");
+
+    try {
+        String jwt = service.login(adminLoginDTO);
+        log.debug("登录成功，JWT：{}", jwt);
+    } catch (Throwable e) {
+        // 由于不确定Spring Security会抛出什么类型的异常
+        // 所以，捕获的是Throwable
+        // 并且，在处理时，应该打印信息，以了解什么情况下会出现哪种异常
+        e.printStackTrace();
+    }
+}
+```
+
+以上测试时在控制台中输出的JWT，可以在`JwtTests`测试类中成功解析（注意：使用相同的`secretKey`）。
+
+完成后，调整`AdminController`中处理登录的请求，当登录成功后，向客户端响应JWT数据：
+
+```java
+// http://localhost:9081/admins/login
+@ApiOperation("管理员登录")
+@ApiOperationSupport(order = 50)
+@PostMapping("/login")
+public JsonResult login(AdminLoginDTO adminLoginDTO) {
+    log.debug("开始处理【管理员登录】的请求，参数：{}", adminLoginDTO);
+    
+    // ↓↓↓↓↓↓↓ 获取调用方法的返回结果，即JWT数据
+    String jwt = adminService.login(adminLoginDTO);
+    
+    //                   ↓↓↓ 将JWT封装到响应对象中
+    return JsonResult.ok(jwt);
+}
+```
+
+完成后，重启项目，通过Knife4j的API文档进行调试，当登录成功后，将响应JWT数据。
 
 
 

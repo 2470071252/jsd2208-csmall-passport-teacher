@@ -20,11 +20,12 @@ public class AdminServiceTests {
     @Test
     void login() {
         AdminLoginDTO adminLoginDTO = new AdminLoginDTO();
-        adminLoginDTO.setUsername("wangkejingzzz");
-        adminLoginDTO.setPassword("123456zzz");
+        adminLoginDTO.setUsername("liucangsong");
+        adminLoginDTO.setPassword("123456");
 
         try {
-            service.login(adminLoginDTO);
+            String jwt = service.login(adminLoginDTO);
+            log.debug("登录成功，JWT：{}", jwt);
         } catch (Throwable e) {
             // 由于不确定Spring Security会抛出什么类型的异常
             // 所以，捕获的是Throwable

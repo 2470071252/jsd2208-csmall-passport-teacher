@@ -45,21 +45,25 @@ public class JwtTests {
     @Test
     void parse() {
         // 需要被解析的JWT，在复制此数据时，切记不要多复制了换行符（\n）
-        String jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZSI6IjEzODAwMTM4MDAxIiwiaWQiOjk1MjcsImV4cCI6MTY3MTA5NTI3MiwidXNlcm5hbWUiOiJ0ZXN0LWp3dCJ9.9aHPOE-JLjCqd9sKEehoZzqGhz7hpsYcUwIzpiVdfmg";
+        String jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZXhwIjoxNjcxNzAyNTY2LCJ1c2VybmFtZSI6ImxpdWNhbmdzb25nIn0.LDOj54D4T0fhoXl8HlneR97a3Z_RdVAL4i1SFT5kwbU";
 
-        // 执行解析
-        Claims claims = Jwts.parser() // 获得JWT解析工具
-                .setSigningKey(secretKey)
-                .parseClaimsJws(jwt)
-                .getBody();
+        try {
+            // 执行解析
+            Claims claims = Jwts.parser() // 获得JWT解析工具
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(jwt)
+                    .getBody();
 
-        // 从Claims中获取生成时存入的数据
-        Object id = claims.get("id");
-        Object username = claims.get("username");
-        Object phone = claims.get("phone");
-        System.out.println("id = " + id);
-        System.out.println("username = " + username);
-        System.out.println("phone = " + phone);
+            // 从Claims中获取生成时存入的数据
+            Object id = claims.get("id");
+            Object username = claims.get("username");
+            Object phone = claims.get("phone");
+            System.out.println("id = " + id);
+            System.out.println("username = " + username);
+            System.out.println("phone = " + phone);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
 }

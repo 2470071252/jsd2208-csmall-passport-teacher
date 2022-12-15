@@ -9,8 +9,11 @@ import cn.tedu.csmall.passport.pojo.entity.Admin;
 import cn.tedu.csmall.passport.pojo.entity.AdminRole;
 import cn.tedu.csmall.passport.pojo.vo.AdminListItemVO;
 import cn.tedu.csmall.passport.pojo.vo.AdminStandardVO;
+import cn.tedu.csmall.passport.security.AdminDetails;
 import cn.tedu.csmall.passport.service.IAdminService;
 import cn.tedu.csmall.passport.web.ServiceCode;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 处理管理员数据的业务实现类
@@ -48,7 +54,7 @@ public class AdminServiceImpl implements IAdminService {
     }
 
     @Override
-    public void login(AdminLoginDTO adminLoginDTO) {
+    public String login(AdminLoginDTO adminLoginDTO) {
         log.debug("开始处理【管理员登录】的业务，参数：{}", adminLoginDTO);
         // 执行认证
         Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -58,9 +64,40 @@ public class AdminServiceImpl implements IAdminService {
         log.debug("认证通过！");
         log.debug("认证结果：{}", authenticateResult); // 注意：此认证结果中的Principal就是UserDetailsServiceImpl中返回的UserDetails对象
 
+        // 从认证结果中取出将要存入到JWT中的数据
+        Object principal = authenticateResult.getPrincipal();
+        AdminDetails adminDetails = (AdminDetails) principal;
+        Long id = adminDetails.getId();
+        String username = adminDetails.getUsername();
+
         // 将认证通过后得到的认证信息存入到SecurityContext中
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        securityContext.setAuthentication(authenticateResult);
+        // 【注意】注释以下2行代码后，在未完成JWT验证流程之前，用户的登录将不可用
+        // SecurityContext securityContext = SecurityContextHolder.getContext();
+        // securityContext.setAuthentication(authenticateResult);
+
+        // ===== 生成并返回JWT =====
+        // 是一个自定义的字符串，应该是一个保密数据，最低要求不少于4个字符，但推荐使用更加复杂的字符串
+        String secretKey = "fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou";
+        // JWT的过期时间
+        Date date = new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000);
+        // 你要存入到JWT中的数据
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", id);
+        claims.put("username", username);
+        // claims.put("权限", "???"); // TODO 待处理
+        String jwt = Jwts.builder() // 获取JwtBuilder，准备构建JWT数据
+                // 【1】Header：主要配置alg（algorithm：算法）和typ（type：类型）属性
+                .setHeaderParam("alg", "HS256")
+                .setHeaderParam("typ", "JWT")
+                // 【2】Payload：主要配置Claims，把你要存入的数据放进去
+                .setClaims(claims)
+                // 【3】Signature：主要配置JWT的过期时间、签名的算法和secretKey
+                .setExpiration(date)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                // 完成
+                .compact(); // 得到JWT数据
+        log.debug("即将返回JWT数据：{}", jwt);
+        return jwt;
     }
 
     @Override

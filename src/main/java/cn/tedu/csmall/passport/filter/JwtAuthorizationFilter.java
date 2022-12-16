@@ -14,6 +14,10 @@ import java.io.IOException;
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
+    public JwtAuthorizationFilter() {
+        log.debug("创建过滤器对象：JwtAuthorizationFilter");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

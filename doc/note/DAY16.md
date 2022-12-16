@@ -22,9 +22,27 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         // 尝试从请求头中获取JWT
         String jwt = request.getHeader("Authorization");
         log.debug("尝试从请求头中获取JWT，结果：{}", jwt);
+        
+        // 放行请求，由后续的组件继续处理
+        filterChain.doFilter(request, response);
     }
 
 }
+```
+
+为了保证此过滤器能正常参与到Spring Security的处理流程中，需要在`SecurityConfiguration`中自动装配此过滤器的对象：
+
+```java
+@Autowired
+private JwtAuthorizationFilter jwtAuthorizationFilter;
+```
+
+并在`void configure(HttpSecurity http)`方法中，将其添加：
+
+```java
+// 将JWT过滤器添加在Spring Security的“用户名密码认证信息过滤器”之前
+http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+
 ```
 
 在Knife4j的API文档调试功能中，可以携带自定义的请求头数据：
@@ -33,7 +51,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 ![image-20221216093143812](images/image-20221216093143812.png)
 
-
+完成后，重启服务器端项目，在API文档的调试中，发起任何请求，都可以在服务器端控制台看到接收到了JWT数据。
 
 
 

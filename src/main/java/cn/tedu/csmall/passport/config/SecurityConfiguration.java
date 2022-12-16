@@ -4,6 +4,7 @@ import cn.tedu.csmall.passport.filter.JwtAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -58,6 +59,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // 配置请求是否需要认证
         http.authorizeRequests() // 配置请求的认证授权
+                .mvcMatchers(HttpMethod.OPTIONS, "/**")
+                .permitAll()
                 .mvcMatchers(urls) // 匹配某些请求路径
                 .permitAll() // 允许直接访问，即不需要通过认证
                 .anyRequest() // 其它任何请求

@@ -451,6 +451,33 @@ Date date = new Date(System.currentTimeMillis() + durationInMinute * 60 * 1000);
 
 
 
+# 关于复杂请求的预检（PreFlight）
+
+浏览器在发起请求时，如果请求头配置了特定的属性，例如`Authorization`，则此请求会被视为**复杂请求**，就会触发**预检（PreFlight）**机制，则浏览器会向此请求路径先出一个`OPTIONS`类型的请求，如果这个`OPTIONS`类型的请求被拒绝，则无法发出原本尝试发出的请求。
+
+在服务器端的`SecurityConfiguration`中，对所有`OPTIONS`的请求直接放行，即可解决此问题：
+
+```java
+// 配置请求是否需要认证
+http.authorizeRequests()
+        .mvcMatchers(HttpMethod.OPTIONS, "/**")  // 新增
+        .permitAll()  // 新增
+        .mvcMatchers(urls)
+        .permitAll()
+        .anyRequest()
+        .authenticated();
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 

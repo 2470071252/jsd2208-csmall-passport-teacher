@@ -1,6 +1,7 @@
 package cn.tedu.csmall.passport.filter;
 
 import cn.tedu.csmall.passport.security.LoginPrincipal;
+import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
@@ -75,8 +76,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         // 从Claims中获取生成时存入的数据
         Long id = claims.get("id", Long.class);
         String username = claims.get("username", String.class);
+        String authoritiesJsonString = claims.get("authorities", String.class);
         log.debug("从JWT中解析得到id：{}", id);
         log.debug("从JWT中解析得到username：{}", username);
+        log.debug("从JWT中解析得到authoritiesJsonString：{}", authoritiesJsonString);
 
         // 将解析JWT得到的管理员信息创建成为AdminPrincipal（当事人）对象
         LoginPrincipal loginPrincipal = new LoginPrincipal();
@@ -84,9 +87,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         loginPrincipal.setUsername(username);
 
         // 准备管理员权限
-        // 【临时】
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("/ams/admin/read"));
+        List<SimpleGrantedAuthority> authorities
+                = JSON.parseArray(authoritiesJsonString, SimpleGrantedAuthority.class);
 
         // 创建Authentication对象，将存入到SecurityContext中
         // 此Authentication对象必须包含：当事人（Principal）、权限（Authorities），不必包含凭证（Credentials）

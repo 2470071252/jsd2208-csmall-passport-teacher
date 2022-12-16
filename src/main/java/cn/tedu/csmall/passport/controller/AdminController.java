@@ -4,6 +4,7 @@ import cn.tedu.csmall.passport.pojo.dto.AdminAddNewDTO;
 import cn.tedu.csmall.passport.pojo.dto.AdminLoginDTO;
 import cn.tedu.csmall.passport.pojo.vo.AdminListItemVO;
 import cn.tedu.csmall.passport.security.AdminDetails;
+import cn.tedu.csmall.passport.security.LoginPrincipal;
 import cn.tedu.csmall.passport.service.IAdminService;
 import cn.tedu.csmall.passport.web.JsonResult;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
@@ -66,11 +67,11 @@ public class AdminController {
     @PreAuthorize("hasAuthority('/ams/admin/delete')")
     @PostMapping("/{id:[0-9]+}/delete")
     public JsonResult delete(@PathVariable Long id,
-                             @ApiIgnore @AuthenticationPrincipal AdminDetails adminDetails) {
+                             @ApiIgnore @AuthenticationPrincipal LoginPrincipal loginPrincipal) {
         log.debug("开始处理【根据id删除删除管理员】的请求，参数：{}", id);
-        log.debug("当事人：{}", adminDetails);
-        log.debug("当事人的ID：{}", adminDetails.getId());
-        log.debug("当事人的用户名：{}", adminDetails.getUsername());
+        log.debug("当事人：{}", loginPrincipal);
+        log.debug("当事人的ID：{}", loginPrincipal.getId());
+        log.debug("当事人的用户名：{}", loginPrincipal.getUsername());
         adminService.delete(id);
         return JsonResult.ok();
     }
@@ -79,6 +80,7 @@ public class AdminController {
     @ApiOperation("启用管理员")
     @ApiOperationSupport(order = 310)
     @ApiImplicitParam(name = "id", value = "管理员ID", required = true, dataType = "long")
+    @PreAuthorize("hasAuthority('/ams/admin/update')")
     @PostMapping("/{id:[0-9]+}/enable")
     public JsonResult setEnable(@PathVariable Long id) {
         log.debug("开始处理【启用管理员】的请求，参数：{}", id);
@@ -90,6 +92,7 @@ public class AdminController {
     @ApiOperation("禁用管理员")
     @ApiOperationSupport(order = 311)
     @ApiImplicitParam(name = "id", value = "管理员ID", required = true, dataType = "long")
+    @PreAuthorize("hasAuthority('/ams/admin/update')")
     @PostMapping("/{id:[0-9]+}/disable")
     public JsonResult setDisable(@PathVariable Long id) {
         log.debug("开始处理【禁用管理员】的请求，参数：{}", id);
@@ -100,6 +103,7 @@ public class AdminController {
     // http://localhost:9081/admins
     @ApiOperation("查询管理员列表")
     @ApiOperationSupport(order = 420)
+    @PreAuthorize("hasAuthority('/ams/admin/read')")
     @GetMapping("")
     public JsonResult list() {
         log.debug("开始处理【查询管理员列表】的请求，参数：无");

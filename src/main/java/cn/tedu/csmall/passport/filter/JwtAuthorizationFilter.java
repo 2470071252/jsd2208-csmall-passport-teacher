@@ -1,8 +1,14 @@
 package cn.tedu.csmall.passport.filter;
 
+import cn.tedu.csmall.passport.security.AdminPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -12,6 +18,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>JWT过滤器</p>
@@ -60,10 +68,29 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 .getBody();
 
         // 从Claims中获取生成时存入的数据
-        Object id = claims.get("id");
-        Object username = claims.get("username");
+        Long id = claims.get("id", Long.class);
+        String username = claims.get("username", String.class);
         log.debug("从JWT中解析得到id：{}", id);
         log.debug("从JWT中解析得到username：{}", username);
+
+        // 将解析JWT得到的管理员信息创建成为AdminPrincipal（当事人）对象
+        AdminPrincipal adminPrincipal = new AdminPrincipal();
+        adminPrincipal.setId(id);
+        adminPrincipal.setUsername(username);
+
+        // 准备管理员权限
+        // 【临时】
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("/ams/admin/read"));
+
+        // 创建Authentication对象，将存入到SecurityContext中
+        // 此Authentication对象必须包含：当事人（Principal）、权限（Authorities），不必包含凭证（Credentials）
+        Authentication authentication
+                = new UsernamePasswordAuthenticationToken(adminPrincipal, null, authorities);
+
+        // 将Authentication对象存入到SecurityContext中
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        securityContext.setAuthentication(authentication);
 
         // 放行请求，由后续的组件继续处理
         filterChain.doFilter(request, response);

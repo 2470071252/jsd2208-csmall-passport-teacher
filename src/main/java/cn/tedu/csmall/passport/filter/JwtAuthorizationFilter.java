@@ -1,6 +1,6 @@
 package cn.tedu.csmall.passport.filter;
 
-import cn.tedu.csmall.passport.security.AdminPrincipal;
+import cn.tedu.csmall.passport.security.LoginPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
@@ -79,9 +79,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         log.debug("从JWT中解析得到username：{}", username);
 
         // 将解析JWT得到的管理员信息创建成为AdminPrincipal（当事人）对象
-        AdminPrincipal adminPrincipal = new AdminPrincipal();
-        adminPrincipal.setId(id);
-        adminPrincipal.setUsername(username);
+        LoginPrincipal loginPrincipal = new LoginPrincipal();
+        loginPrincipal.setId(id);
+        loginPrincipal.setUsername(username);
 
         // 准备管理员权限
         // 【临时】
@@ -91,7 +91,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         // 创建Authentication对象，将存入到SecurityContext中
         // 此Authentication对象必须包含：当事人（Principal）、权限（Authorities），不必包含凭证（Credentials）
         Authentication authentication
-                = new UsernamePasswordAuthenticationToken(adminPrincipal, null, authorities);
+                = new UsernamePasswordAuthenticationToken(loginPrincipal, null, authorities);
 
         // 将Authentication对象存入到SecurityContext中
         log.debug("即将向SecurityContext中存入认证信息：{}", authentication);

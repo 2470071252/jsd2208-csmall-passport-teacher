@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class AdminPrincipal implements Serializable {
+public class LoginPrincipal implements Serializable {
 
     /**
      * 数据id

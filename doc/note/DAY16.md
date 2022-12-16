@@ -423,7 +423,31 @@ csmall:
 private String secretKey;
 ```
 
+**注意：**如果你在配置文件中使用了新的`secretKey`值，请重新配置API文档中的全局参数，否则，将导致原本已经配置的JWT无法正常解析。
 
+另外，也可以把JWT的有效时长也配置在`application-dev.yml`中：
+
+```yaml
+csmall:
+  jwt:
+    secret-key: fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou
+    # 【新增】JWT的有效时长，以分钟为单位
+    duration-in-minute: 10080
+```
+
+并在`AdminServiceImpl`类中将此配置值读取到属性中：
+
+```java
+@Value("${csmall.jwt.duration-in-minute}")
+private long durationInMinute;
+```
+
+然后，在设置JWT过期时间时，应用此配置值：
+
+```java
+// JWT的过期时间
+Date date = new Date(System.currentTimeMillis() + durationInMinute * 60 * 1000);
+```
 
 
 

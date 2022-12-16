@@ -40,6 +40,8 @@ public class AdminServiceImpl implements IAdminService {
 
     @Value("${csmall.jwt.secret-key}")
     private String secretKey;
+    @Value("${csmall.jwt.duration-in-minute}")
+    private long durationInMinute;
     @Autowired
     private AdminMapper adminMapper;
     @Autowired
@@ -83,7 +85,7 @@ public class AdminServiceImpl implements IAdminService {
 
         // ===== 生成并返回JWT =====
         // JWT的过期时间
-        Date date = new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000);
+        Date date = new Date(System.currentTimeMillis() + durationInMinute * 60 * 1000);
         // 你要存入到JWT中的数据
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", id);

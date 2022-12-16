@@ -18,6 +18,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,6 +38,8 @@ import java.util.*;
 @Service
 public class AdminServiceImpl implements IAdminService {
 
+    @Value("${csmall.jwt.secret-key}")
+    private String secretKey;
     @Autowired
     private AdminMapper adminMapper;
     @Autowired
@@ -79,8 +82,6 @@ public class AdminServiceImpl implements IAdminService {
         // securityContext.setAuthentication(authenticateResult);
 
         // ===== 生成并返回JWT =====
-        // 是一个自定义的字符串，应该是一个保密数据，最低要求不少于4个字符，但推荐使用更加复杂的字符串
-        String secretKey = "fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou";
         // JWT的过期时间
         Date date = new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000);
         // 你要存入到JWT中的数据

@@ -6,6 +6,8 @@ import cn.tedu.csmall.passport.web.ServiceCode;
 import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -42,6 +44,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     public static final int JWT_MIN_LENGTH = 113;
 
+    @Value("${csmall.jwt.secret-key}")
+    private String secretKey;
+
     public JwtAuthorizationFilter() {
         log.debug("创建过滤器对象：JwtAuthorizationFilter");
     }
@@ -72,7 +77,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         // 尝试解析JWT
         log.debug("获取到的JWT被视为有效，准备解析JWT……");
-        String secretKey = "fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou";
         Claims claims = null;
         try {
             claims = Jwts.parser()
@@ -99,6 +103,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             String message = "非法访问！";
             log.warn("解析JWT时出现MalformedJwtException，响应的消息：{}", message);
             JsonResult jsonResult = JsonResult.fail(ServiceCode.ERR_JWT_MALFORMED, message);
+            PrintWriter writer = response.getWriter();
+            writer.println(JSON.toJSONString(jsonResult));
+            writer.close();
+            return;
+        } catch (Throwable e) {
+            String message = "服务器忙，请稍后再尝试（开发阶段，请检查服务器端控制台）！";
+            log.warn("解析JWT时出现{}，响应的消息：{}", e.getClass().getName(), message);
+            e.printStackTrace();
+            JsonResult jsonResult = JsonResult.fail(ServiceCode.ERR_UNKNOWN, message);
             PrintWriter writer = response.getWriter();
             writer.println(JSON.toJSONString(jsonResult));
             writer.close();

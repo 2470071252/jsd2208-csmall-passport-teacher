@@ -17,3 +17,10 @@ spring:
 logging:
   level:
     cn.tedu.csmall: trace
+
+# 当前项目中的自定义配置
+csmall:
+  # JWT相关配置
+  jwt:
+    # 生成和解析JWT时使用的secretKey，此属性的值不得少于4个字符，建议在30~60字符之间，应该是一个不容易被猜测的值
+    secret-key: fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou

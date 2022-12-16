@@ -346,6 +346,87 @@ List<SimpleGrantedAuthority> authorities
 
 至此，各管理员登录后，在认证信息中都有各自对应的权限（仍是根据JWT识别管理员）。
 
+# 处理解析JWT时可能出现的异常
+
+解析JWT时可能出现异常，但是，并不能使用此前的全局异常处理器来处理这几种异常，因为解析JWT是发生在过滤器中，过滤器是最早接收到请求的组件，此时其它组件（包括控制器、全局异常处理器等）都还没有开始处理此请求，而全局异常处理器只能处理由控制器抛出的异常，所以，此处并不适用，只能使用`try...catch`进行处理。
+
+在`ServiceCode`中添加新的业务状态码，以对应解析JWT时可能出现的异常，然后，使用`try...catch`包裹解析JWT的代码，以处理异常：
+
+```java
+// 设置响应的文档类型，用于处理异常时
+response.setContentType("application/json;charset=utf-8");
+
+// 尝试解析JWT
+log.debug("获取到的JWT被视为有效，准备解析JWT……");
+String secretKey = "fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou";
+Claims claims = null;
+try {
+    claims = Jwts.parser()
+            .setSigningKey(secretKey)
+            .parseClaimsJws(jwt)
+            .getBody();
+} catch (ExpiredJwtException e) {
+    String message = "您的登录信息已过期，请重新登录！";
+    log.warn("解析JWT时出现ExpiredJwtException，响应的消息：{}", message);
+    JsonResult jsonResult = JsonResult.fail(ServiceCode.ERR_JWT_EXPIRED, message);
+    PrintWriter writer = response.getWriter();
+    writer.println(JSON.toJSONString(jsonResult));
+    writer.close();
+    return;
+} catch (SignatureException e) {
+    String message = "非法访问！";
+    log.warn("解析JWT时出现SignatureException，响应的消息：{}", message);
+    JsonResult jsonResult = JsonResult.fail(ServiceCode.ERR_JWT_SIGNATURE, message);
+    PrintWriter writer = response.getWriter();
+    writer.println(JSON.toJSONString(jsonResult));
+    writer.close();
+    return;
+} catch (MalformedJwtException e) {
+    String message = "非法访问！";
+    log.warn("解析JWT时出现MalformedJwtException，响应的消息：{}", message);
+    JsonResult jsonResult = JsonResult.fail(ServiceCode.ERR_JWT_MALFORMED, message);
+    PrintWriter writer = response.getWriter();
+    writer.println(JSON.toJSONString(jsonResult));
+    writer.close();
+    return;
+} catch (Throwable e) {
+    String message = "服务器忙，请稍后再尝试（开发阶段，请检查服务器端控制台）！";
+    log.warn("解析JWT时出现{}，响应的消息：{}", e.getClass().getName(), message);
+    e.printStackTrace();
+    JsonResult jsonResult = JsonResult.fail(ServiceCode.ERR_UNKNOWN, message);
+    PrintWriter writer = response.getWriter();
+    writer.println(JSON.toJSONString(jsonResult));
+    writer.close();
+    return;
+}
+```
+
+
+
+
+
+在`application-dev.yml`中添加自定义配置：
+
+```yaml
+# 当前项目中的自定义配置
+csmall:
+  # JWT相关配置
+  jwt:
+    # 生成和解析JWT时使用的secretKey，此属性的值不得少于4个字符，建议在30~60字符之间，应该是一个不容易被猜测的值
+    secret-key: fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou
+```
+
+然后，在`JwtAuthorizationFilter`和`AdminServiceImpl`中，都不再使用原有的`secretKey`局部变量（删除原有的那条语句），改为在类中通过`@Value`注解为全局的`secretKey`属性（新声明的）注入值：
+
+```java
+@Value("${csmall.jwt.secret-key}")
+private String secretKey;
+```
+
+
+
+
+
 
 
 

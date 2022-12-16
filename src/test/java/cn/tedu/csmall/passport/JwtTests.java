@@ -11,8 +11,11 @@ import java.util.Map;
 
 public class JwtTests {
 
+    // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpIjoxLCJleHAiOjE2NzExNTg1NDh9.-utc2ROqlwi3_XiWsGbHPM14F-5khYTjZznDH4740w4
+    // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OTUyNywiZXhwIjoxNjcxMTU4NDc3LCJ1c2VybmFtZSI6InRlc3Qtand0In0.0W-MD6s1xnkmt-dX9D8dpskUzJhaXWofmpv6SfDmDts
     // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZSI6IjEzODAwMTM4MDAxIiwiaWQiOjk1MjcsImV4cCI6MTY3MTA5NDExNywidXNlcm5hbWUiOiJ0ZXN0LWp3dCJ9.p5gQ6fg-mgAvDF3LllRBHwmnqkTVbHAAM8fDsMTIHuA
     // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZSI6IjEzODAwMTM4MDAxIiwiaWQiOjk1MjcsImV4cCI6MTY3MTA5NTI3MiwidXNlcm5hbWUiOiJ0ZXN0LWp3dCJ9.9aHPOE-JLjCqd9sKEehoZzqGhz7hpsYcUwIzpiVdfmg
+    // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ4eCI6ImZkYXNmamhrZHNhZmlseWV3c2hrYWZkc2FsaXlmaGtkYXNmbC5oanRncnFlOThwdW9pajV0Z2VydHZzdTtqa2ZnZmQuc2dqaWZwd2d1cmVoamtnbmYuZHNvbGlndXJlamhrbi5nZnZkcG90OXU1NHJqZ2ZsZXdrbXZkLnNpb2xncmRmZHNkZ3JkZ2hydGp5dGVqdHJnZmh0cnl3dHJodGdmc2hiZ2ZzZ2Zkd3JlZ3JmZHNnZiIsInBob25lIjoiMTM4MDAxMzgwMDEiLCJpZCI6OTUyNywiZXhwIjoxNjcxMTU4MzMyLCJ1c2VybmFtZSI6InRlc3Qtand0In0.lrtKZD-EUOsvi6H0uY40dVXDRp0nexkL9gs9w9h3G8M
 
     // 是一个自定义的字符串，应该是一个保密数据，最低要求不少于4个字符，但推荐使用更加复杂的字符串
     String secretKey = "fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou";
@@ -24,9 +27,8 @@ public class JwtTests {
 
         // 你要存入到JWT中的数据
         Map<String, Object> claims = new HashMap<>();
-        claims.put("id", 9527);
-        claims.put("username", "test-jwt");
-        claims.put("phone", "13800138001");
+        claims.put("i", 1);
+        // claims.put("username", "test-jwt");
 
         String jwt = Jwts.builder() // 获取JwtBuilder，准备构建JWT数据
                 // 【1】Header：主要配置alg（algorithm：算法）和typ（type：类型）属性

@@ -293,9 +293,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 - 部分代码需要更规范
   - 解析JWT时使用的`secretKey`是当前类的局部变量，在生成JWT时也有一个同样的局部变量，导致在2个类中都声明了完全相同的局部变量，是不合理的
 
+# 关于处理权限
 
+在`AdminServiceImpl`处理“管理员登录”的业务时，如果登录成功，应该将权限写入到JWT中，则客户端收到的JWT就包含了权限信息，后续客户端携带“包含权限信息”的JWT提交请求，则JWT过滤器可以解析得到权限，并存入到`SecurityContext`中去。
 
+为了保证权限列表（`Collection<? extends GrantedAuthority>`）写入到JWT中后，解析时还可以还原成原本的类型，应该在写入JWT之前，将权限列表转换成JSON格式的字符串，后续，解析JWT时，将此JSON格式的字符串还原成`Collection<? extends GrantedAuthority>`类型。
 
+可以使用`fastjson`实现对象与JSON的相互转换，则在`pom.xml`中添加依赖：
 
 ```xml
 <!-- fastjson：实现对象与JSON的相互转换 -->
@@ -305,6 +309,42 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     <version>1.2.75</version>
 </dependency>
 ```
+
+然后，在`AdminServiceImpl`处理“管理员登录”的业务中，当通过认证后：
+
+```java
+Collection<GrantedAuthority> authorities = adminDetails.getAuthorities();
+String authoritiesJsonString = JSON.toJSONString(authorities);
+log.debug("认证结果中的当事人authorities：{}", authorities);
+log.debug("认证结果中的当事人authoritiesJsonString：{}", authoritiesJsonString);
+```
+
+并将JSON字符串写入到JWT中：
+
+```java
+// 你要存入到JWT中的数据
+Map<String, Object> claims = new HashMap<>();
+claims.put("id", id);
+claims.put("username", username);
+claims.put("authorities", authoritiesJsonString); // 新增
+```
+
+在`JwtAuthorizationFilter`中即可从JWT中解析得到权限列表的JSON字符串：
+
+```java
+String authoritiesJsonString = claims.get("authorities", String.class);
+log.debug("从JWT中解析得到authoritiesJsonString：{}", authoritiesJsonString);
+```
+
+并将其转换成所需的集合类型：
+
+```java
+// 准备管理员权限
+List<SimpleGrantedAuthority> authorities
+        = JSON.parseArray(authoritiesJsonString, SimpleGrantedAuthority.class);
+```
+
+至此，各管理员登录后，在认证信息中都有各自对应的权限（仍是根据JWT识别管理员）。
 
 
 

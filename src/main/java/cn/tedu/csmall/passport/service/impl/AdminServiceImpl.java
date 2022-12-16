@@ -82,7 +82,8 @@ public class AdminServiceImpl implements IAdminService {
         // 是一个自定义的字符串，应该是一个保密数据，最低要求不少于4个字符，但推荐使用更加复杂的字符串
         String secretKey = "fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou";
         // JWT的过期时间
-        Date date = new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000);
+        // Date date = new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000);
+        Date date = new Date(System.currentTimeMillis() + 10 * 1000);
         // 你要存入到JWT中的数据
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", id);

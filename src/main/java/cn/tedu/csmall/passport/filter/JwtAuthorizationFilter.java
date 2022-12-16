@@ -3,6 +3,7 @@ package cn.tedu.csmall.passport.filter;
 import cn.tedu.csmall.passport.security.LoginPrincipal;
 import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,10 +70,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         // 尝试解析JWT
         log.debug("获取到的JWT被视为有效，准备解析JWT……");
         String secretKey = "fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou";
-        Claims claims = Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(jwt)
-                .getBody();
+        Claims claims = null;
+        try {
+            claims = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(jwt)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            PrintWriter writer = response.getWriter();
+            writer.println("ExpiredJwtException...");
+            writer.flush();
+            writer.close();
+            return;
+        }
 
         // 从Claims中获取生成时存入的数据
         Long id = claims.get("id", Long.class);
@@ -94,7 +105,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         // 此Authentication对象必须包含：当事人（Principal）、权限（Authorities），不必包含凭证（Credentials）
         Authentication authentication
                 = new UsernamePasswordAuthenticationToken(
-                        loginPrincipal, null, authorities);
+                loginPrincipal, null, authorities);
 
         // 将Authentication对象存入到SecurityContext中
         log.debug("即将向SecurityContext中存入认证信息：{}", authentication);

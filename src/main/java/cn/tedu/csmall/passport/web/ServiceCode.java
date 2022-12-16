@@ -53,6 +53,18 @@ public enum ServiceCode {
      */
     ERR_SELECT(50030),
     /**
+     * 错误：JWT过期
+     */
+    ERR_JWT_EXPIRED(60100),
+    /**
+     * 错误：JWT签名错误
+     */
+    ERR_JWT_SIGNATURE(60200),
+    /**
+     * 错误：JWT格式错误
+     */
+    ERR_JWT_MALFORMED(60300),
+    /**
      * 错误：未知错误
      */
     ERR_UNKNOWN(99999);

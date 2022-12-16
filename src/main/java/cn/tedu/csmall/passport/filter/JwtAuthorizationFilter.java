@@ -1,6 +1,8 @@
 package cn.tedu.csmall.passport.filter;
 
 import cn.tedu.csmall.passport.security.LoginPrincipal;
+import cn.tedu.csmall.passport.web.JsonResult;
+import cn.tedu.csmall.passport.web.ServiceCode;
 import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -77,8 +79,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     .parseClaimsJws(jwt)
                     .getBody();
         } catch (ExpiredJwtException e) {
+            String message = "您的登录信息已过期，请重新登录！";
+            JsonResult jsonResult = JsonResult.fail(ServiceCode.ERR_JWT_EXPIRED, message);
+            response.setContentType("application/json;charset=utf-8");
             PrintWriter writer = response.getWriter();
-            writer.println("ExpiredJwtException...");
+            writer.println(JSON.toJSONString(jsonResult));
             writer.flush();
             writer.close();
             return;

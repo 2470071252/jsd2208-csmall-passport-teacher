@@ -53,6 +53,44 @@ http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilte
 
 完成后，重启服务器端项目，在API文档的调试中，发起任何请求，都可以在服务器端控制台看到接收到了JWT数据。
 
+当接收到JWT后，应该对JWT数据进行最基本的检查，然后再尝试解析，例如，当接收到的JWT为`null`时，肯定没有必要尝试解析，同理，如果JWT为`""`空字符串，或仅有空白（空格、TAB制表位等）组成的字符串，都可以视为是无效的，可以通过`StringUtils.hasText()`方法进行检查。
+
+另外，一个有效的JWT应该是`Header.Payload.Signature`这3部分组成的，各部分使用小数点分隔，其中，`Header`部分固定为36字符，`Signature`部分固定为43字符，中间的`Payload`根据存入的数据长度来决定，整个JWT数据的总长度至少113字符，所以，还可以做进一步的检查，例如要求JWT的长度至少113，甚至使用正则表达式进行检查。
+
+需要注意的是：如果客户端携带的JWT是无效的，应该执行“放行”操作，不要因为JWT基本格式无效就返回错误，执行“放行”后，还会有Spring Security的其它组件来处理此请求，例如“白名单”路径的请求可以正常访问，其它路径的请求在没有获取到认证信息时将返回`403`。
+
+所以，在接收到JWT后，先进行基本格式的检查：
+
+```java
+// 检查是否获取到了有效的JWT
+if (!StringUtils.hasText(jwt) || jwt.length() < JWT_MIN_LENGTH) {
+    // 对于无效的JWT，放行请求，由后续的组件继续处理
+    log.debug("获取到的JWT被视为无效，当前过滤器将放行……");
+    filterChain.doFilter(request, response);
+    return;
+}
+```
+
+接下来，即可尝试解析JWT：
+
+```java
+// 尝试解析JWT
+log.debug("获取到的JWT被视为有效，准备解析JWT……");
+String secretKey = "fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou";
+Claims claims = Jwts.parser()
+        .setSigningKey(secretKey)
+        .parseClaimsJws(jwt)
+        .getBody();
+
+// 从Claims中获取生成时存入的数据
+Long id = claims.get("id", Long.class);
+String username = claims.get("username", String.class);
+log.debug("从JWT中解析得到id：{}", id);
+log.debug("从JWT中解析得到username：{}", username);
+```
+
+
+
 
 
 

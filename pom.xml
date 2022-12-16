@@ -60,6 +60,12 @@
             <artifactId>jjwt</artifactId>
             <version>0.9.1</version>
         </dependency>
+        <!-- fastjson：实现对象与JSON的相互转换 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.75</version>
+        </dependency>
         <!-- Lombok的依赖项，主要用于简化POJO类的编写 -->
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -20,15 +20,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 处理管理员数据的业务实现类
@@ -69,6 +67,7 @@ public class AdminServiceImpl implements IAdminService {
         AdminDetails adminDetails = (AdminDetails) principal;
         Long id = adminDetails.getId();
         String username = adminDetails.getUsername();
+        Collection<GrantedAuthority> authorities = adminDetails.getAuthorities();
 
         // 将认证通过后得到的认证信息存入到SecurityContext中
         // 【注意】注释以下2行代码后，在未完成JWT验证流程之前，用户的登录将不可用
@@ -84,7 +83,7 @@ public class AdminServiceImpl implements IAdminService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", id);
         claims.put("username", username);
-        // claims.put("权限", "???"); // TODO 待处理
+        claims.put("authorities", authorities);
         String jwt = Jwts.builder() // 获取JwtBuilder，准备构建JWT数据
                 // 【1】Header：主要配置alg（algorithm：算法）和typ（type：类型）属性
                 .setHeaderParam("alg", "HS256")

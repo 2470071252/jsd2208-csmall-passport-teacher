@@ -128,7 +128,7 @@ public class LoginPrincipal implements Serializable {
 }
 ```
 
-在`JwtAuthorization`中，将解析JWT得到的`id`和`username`封装起来，用于创建`Authentication`对象（由于权限暂未处理，暂时随便创建一个）：
+在`JwtAuthorizationFilter`中，将解析JWT得到的`id`和`username`封装起来，用于创建`Authentication`对象（由于权限暂未处理，暂时随便创建一个）：
 
 ```java
 // 将解析JWT得到的管理员信息创建成为AdminPrincipal（当事人）对象
@@ -159,11 +159,11 @@ log.debug("JWT过滤器执行完毕，放行！");
 filterChain.doFilter(request, response);
 ```
 
-至此，已经完成此过滤器的基本代码，包括：接收JWT、解析JWT、将登录信息创建为认证对象、将认证对象存入到`SecurityContext`中，当此过滤器放行后，后续执行的Spring Security组件就可以通过`SecurityContext`中的认证信息判断出“已经通过认证”的状态，并能够判断权限。
+至此，已经完成此过滤器的基础代码，包括：接收JWT、解析JWT、将登录信息创建为认证对象、将认证对象存入到`SecurityContext`中，当此过滤器放行后，后续执行的Spring Security组件就可以通过`SecurityContext`中的认证信息判断出“已经通过认证”的状态，并能够判断权限。
 
 所以，重启项目，在API文档的调试中，携带有效的JWT即可成功进行相关访问。
 
-**需要注意：**由于`SecurityContext`本身也是基于Session的，所以，在调试时，只要曾经携带有效的JWT访问过，就会将认证信息存入到`SecurityContext`中，在接下来的一段时间内，只要Session没有超时，即使不携带JWT也可以成功访问！其实，目前已经不再需要使用Session了，而且，不携带有效的JWT的访问本身就可以视为“无效”，所以，在当前过滤器刚刚执行时，可以清除`SecurityContext`，则`SecurityContext`中将不再包含认证信息，就可以避免刚才这种情况（曾经存入过认证信息，Session未超时就可以不携带JWT），从而实现“每次请求都必须携带JWT”的效果。
+**需要注意：**由于`SecurityContext`本身也是基于Session的，所以，在调试时，只要曾经携带有效的JWT访问过，就会将认证信息存入到`SecurityContext`中，在接下来的一段时间内，只要Session没有超时，即使不携带JWT也可以成功访问！其实，目前已经不再需要使用Session了，而且，不携带有效的JWT的访问本身就可以视为“无效”，所以，在当前过滤器刚刚执行时，可以清除`SecurityContext`，则`SecurityContext`中将不再包含认证信息，就可以避免刚才这种情况（曾经存入过认证信息，Session未超时就可以不携带JWT），从而实现“每次请求都必须携带JWT才会有认证信息”的效果。
 
 关于清除`SecurityContext`的代码（以下代码应该在过滤器中方法的最开始位置）：
 
@@ -291,11 +291,20 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
   - 以上代码中为每个携带JWT的请求给了一个固定的临时权限，与当前管理员的实际权限不符
 - 没有处理解析JWT可能出现的异常
 - 部分代码需要更规范
-  - 解析JWT时使用的`secretKey`是当前类的局部变量，在生成JWT时也有一个同样的变量，导致在2个类中都声明了完全相同的变量，是不合理的
+  - 解析JWT时使用的`secretKey`是当前类的局部变量，在生成JWT时也有一个同样的局部变量，导致在2个类中都声明了完全相同的局部变量，是不合理的
 
 
 
 
+
+```xml
+<!-- fastjson：实现对象与JSON的相互转换 -->
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>fastjson</artifactId>
+    <version>1.2.75</version>
+</dependency>
+```
 
 
 

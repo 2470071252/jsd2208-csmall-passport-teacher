@@ -91,7 +91,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         // 创建Authentication对象，将存入到SecurityContext中
         // 此Authentication对象必须包含：当事人（Principal）、权限（Authorities），不必包含凭证（Credentials）
         Authentication authentication
-                = new UsernamePasswordAuthenticationToken(loginPrincipal, null, authorities);
+                = new UsernamePasswordAuthenticationToken(
+                        loginPrincipal, null, authorities);
 
         // 将Authentication对象存入到SecurityContext中
         log.debug("即将向SecurityContext中存入认证信息：{}", authentication);

@@ -1,6 +1,6 @@
-# Spring Security框架
+# 64. 关于Spring Security框架
 
-## Spring Security的作用
+## 64.1. Spring Security的作用
 
 Spring Security主要解决了**认证**和**授权**相关的问题。
 
@@ -8,7 +8,7 @@ Spring Security主要解决了**认证**和**授权**相关的问题。
 
 授权（Authorize）：允许用户访问受保护的资源，即某些请求需要特定的权限，检查用户是否有权限提交这些请求。
 
-## Spring Security的依赖项
+## 64.2. Spring Security的依赖项
 
 在Spring Boot项目中，当需要添加Spring Security的依赖时，依赖项为`spring-boot-starter-security`，即：
 
@@ -40,7 +40,7 @@ Spring Security主要解决了**认证**和**授权**相关的问题。
 
   当成功的退出登录后，会重定向到登录页面，此时，回到所有请求都需要登录的状态
 
-## 防止伪造的跨域攻击
+## 64.3. 防止伪造的跨域攻击
 
 默认情况下，即使登录成功，在API文档的调试功能中，所有`POST`请求都不能正常访问，这是因为Spring Security框架默认开启了“防止伪造的跨域攻击”这种防御机制。
 
@@ -66,7 +66,7 @@ Spring Security的防御机制表现为：所有POST请求必须提交某个值�
   - 删除后，默认情况下，所有的请求都不需要登录了
 - 添加`http.csrf().disable();`
 
-## 关于请求是否需要认证
+## 64.4. 关于请求是否需要认证
 
 当项目添加了Spring Security的依赖后，所有请求默认都是需要认证（需要成功登录）的，当添加以上配置类，并删除了`super`调用父类方法后，所有请求都不再要求认证了！
 
@@ -98,7 +98,7 @@ http.authorizeRequests() // 配置请求的认证授权
 
 **注意：**以上`anyRequest()`其实表示的是“任何请求”或者“所有请求”，并非“其它任何请求”！以上配置的机制是**优先原则**，例如“白名单”中的路径被配置为`permitAll()`，接下来，`anyRequest()`表示的范围其实也包含“白名单”中的所有路径，但是，不会覆盖此前的配置！
 
-## 关于默认的登录页面
+## 64.5. 关于默认的登录页面
 
 Spring Security默认的登录页面也是在`void configure(HttpSecurity)`方法中配置的，默认情况下，父类配置中是开启了登录表单的，如果子类（自定义的配置类继承自`WebSecurityConfigurerAdapter`）中没有通过`super`调用父类的方法，则不会开启登录表单！
 
@@ -110,7 +110,7 @@ Spring Security默认的登录页面也是在`void configure(HttpSecurity)`方�
 http.formLogin(); // 开启登录表单
 ```
 
-## 关于`void configure(HttpSecurity)`方法的配置语法
+## 64.6. 关于`void configure(HttpSecurity)`方法的配置语法
 
 关于请求的安全配置都是在`void configure(HttpSecurity http)`方法中调用参数对象的方法配置的，对于配置不同的内容，可以分开来配置，即使用多条语句，每条语句都调用参数`http`的方法，例如：
 
@@ -139,7 +139,7 @@ http.authorizeRequests()
 
 并且，以上不冲突各配置可以不区分先后顺序。
 
-## 使用自定义的用户名与密码登录
+## 64.7. 使用自定义的用户名与密码登录
 
 Spring Security在处理认证时，会自动调用`UserDetailsService`接口对象中的`UserDetails loadUserByUsername(String username)`方法，此方法是**根据用户名获取用户详情**的，此方法返回的结果中应该至少包括用户的密码及其它与登录密切相关的信息，例如账号的状态（是否启用等）、账号的权限等。
 
@@ -207,7 +207,7 @@ public PasswordEncoder passwordEncoder() {
 - 如果用户名正确，但密码错误，在页面中将提示：`用户名或密码错`
 - 如果用户名与密码均正确，将重定向到此前访问的页面，并且，在API文档中调试任何功能都是可用的
 
-## 关于密码编码器
+## 64.8. 关于密码编码器
 
 Spring Security认为所有的密码都应该是加密的，框架中定义了名为`PasswordEncoder`的接口，接口定义如下：
 
@@ -230,7 +230,7 @@ public interface PasswordEncoder {
 
 所以，即使使用没有加密的密码，也需要配置`NoOpPasswordEncoder`。
 
-在Spring Security中，提供了`BCryptPasswordEncoder`类，是`PasswordEncoder`接口的实现类，此类可以用于处理Bcrypt算法的编码、验证密码，推荐使用这种密码编码器，关于`BCryptPasswordEncoder`类的基本使用，测试如下：
+在Spring Security中，提供了`BCryptPasswordEncoder`类，是`PasswordEncoder`接口的实现类，此类可以用于处理BCrypt算法的编码、验证密码，推荐使用这种密码编码器，关于`BCryptPasswordEncoder`类的基本使用，测试如下：
 
 ```java
 package cn.tedu.csmall.passport;
@@ -239,7 +239,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-public class BcryptTest {
+public class BCryptTest {
 
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -281,7 +281,7 @@ public class BcryptTest {
 }
 ```
 
-在项目中，使用Bcrypt算法处理密码时，需要将`PasswordEncoder`的实现对象改为`BCryptPasswordEncoder`：
+在项目中，使用BCrypt算法处理密码时，需要将`PasswordEncoder`的实现对象改为`BCryptPasswordEncoder`：
 
 ```java
 @Bean
@@ -312,7 +312,7 @@ if ("root".equals(s)) {
 }
 ```
 
-## 使用数据库的账号登录
+## 64.9. 使用数据库的账号登录
 
 首先，需要在Mapper层实现“根据用户名查询管理员的登录信息”的功能。
 
@@ -445,7 +445,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 }
 ```
 
-## 使用前后端分离的登录
+## 64.10. 使用前后端分离的登录
 
 目前，项目中可以通过数据库中的账号信息进行登录，但是，是通过Spring Security提供的登录表单来登录的，这不是前后端分离的做法，`csmall-web-client`无法与此进行交互。
 

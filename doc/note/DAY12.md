@@ -1,10 +1,10 @@
-# 关于Spring框架
+# 61. 关于Spring框架
 
-## Spring框架的作用
+## 61.1. Spring框架的作用
 
 Spring框架主要解决了创建对象、管理对象的相关问题。
 
-## Spring框架的依赖项
+## 61.2. Spring框架的依赖项
 
 当在项目中需要使用Spring框架时，需要添加`spring-context`依赖项，例如：
 
@@ -19,7 +19,7 @@ Spring框架主要解决了创建对象、管理对象的相关问题。
 
 当然，在Spring Boot项目中，默认已经包含此依赖项（可能版本不是以上`5.3.20`，但这并不重要），其实，任何被实际应用的Spring Xxx框架都包含`spring-context`，例如Spring MVC、Spring JDBC、Spring Validation、Spring Security等。
 
-## 通过Spring框架创建对象--组件扫描
+## 61.3. 通过Spring框架创建对象--组件扫描
 
 在配置类上使用`@ComponentScan`注解，可以开启组件扫描，一旦这个配置类被加载，就会扫描特定的包及其子孙包中的所有类，如果扫描到的类是组件类，就会自动创建这些类的对象。
 
@@ -56,7 +56,7 @@ Spring框架主要解决了创建对象、管理对象的相关问题。
 - `@ControllerAdvice`
 - `@RestControllerAdvice`
 
-## 通过Spring框架创建对象--@Bean方法
+## 61.4. 通过Spring框架创建对象--@Bean方法
 
 在配置类中，可以自定义某个方法，此方法可以返回某个对象，然后，在方法上添加`@Bean`注解，则Spring加载此配置类时，就会自动执行此方法，从而实现创建对象的效果！
 
@@ -74,7 +74,7 @@ public class XxxConfiguration {
 }
 ```
 
-## 通过Spring框架创建对象--其它
+## 61.5. 通过Spring框架创建对象--其它
 
 无论是组件扫描的做法，还是`@Bean`方法的做法，只要是由Spring执行的创建，被创建出来的对象都会被Spring保管起来，后续，可以通过Spring获取这些对象。
 
@@ -86,7 +86,7 @@ public class XxxConfiguration {
 
 每个Spring Bean都有一个名字，如果是通过组件扫描的做法创建的Bean，当类名的首字母是大写的，且第2个字母是小写，则此Spring Bean的名称就是将类名的首字母改为小写，例如`AdminController`的Bean Name就是`adminController`，如果不满足首字母大写且第2字母小写的规则，则Spring Bean的名称就是类名，也可以通过组件注解来指定名称，例如`@Component("adminController")`；如果是通过`@Bean`方法的做法创建的Bean，则Bean Name就是方法名称，也可以通过注解参数来指定名称，例如`@Bean("adminController")`。
 
-## Spring Bean的作用域
+## 61.6. Spring Bean的作用域
 
 默认情况下，Spring Bean都是单例的！如果你不希望某个Spring Bean是单例的，可以使用`@Scope("prototype")`，当使用组件扫描的做法时，在组件类上添加此注解，当使用`@Bean`方法的做法时，在方法上添加此注解。
 
@@ -98,7 +98,7 @@ public class XxxConfiguration {
 
 对于单例的Spring Bean，默认情况下是**预加载**的，如果你不希望某个Spring Bean是预加载的，可以使用`@Lazy`注解，当使用组件扫描的做法时，在组件类上添加此注解，当使用`@Bean`方法的做法时，在方法上添加此注解，会使得Spring Bean是**懒加载**的。
 
-## 自动装配机制
+## 61.7. 自动装配机制
 
 Spring的自动装配机制表现为：当类中的某个属性需要值时，或被Spring调用的方法的参数需要值时，通过特定的语法表现（通常是添加注解），Spring可以从容器中找出**合适的**对象，为属性或方法参数赋值。
 
@@ -199,7 +199,7 @@ public class AdminController {
   - 通过构造方法注入值
 - 请记住Spring框架调用构造方法的机制
 
-## 关于IoC与DI
+## 61.8. 关于IoC与DI
 
 **IoC**：**I**nversion **o**f **C**ontrol，即**控制反转**，即：将对象的控制权交给框架
 
@@ -207,19 +207,19 @@ public class AdminController {
 
 Spring通过DI完善了IoC。
 
-## 其它
+## 61.9. 其它
 
 Spring最核心的内容，主要分为：Spring IoC、Spring AOP，其中，Spring AOP会在本阶段末期再讲。
 
-# Spring MVC
+# 62. 关于Spring MVC框架
 
-## Spring MVC框架的作用
+## 62.1. Spring MVC框架的作用
 
 Spring MVC框架主要解决了接收请求、响应结果的相关问题（其实，并没有关注MVC中的M）。
 
 > 提示：**MVC** = **M**odel + **V**iew + **C**ontroller，这是主流的开发项目的思想，它认为每个项目至少需要有这3个部分，才是一个完整的项目，其中，Controller是控制器，用于接收请求、响应结果，View是视图，早些年在不是前后端分离的项目中，服务器端在处理完请求后，应该向客户端响应某个页面，此页面就是视图，目前，主流的设计方案是前后端分离的，则服务器端不需要也不会处理视图，Model是数据模型，是一套相对固定的数据处理流程，在项目中表现为Service与Mapper。
 
-## Spring MVC框架的依赖项
+## 62.2. Spring MVC框架的依赖项
 
 当在项目中需要使用Spring框架时，需要添加`spring-webmvc`依赖项，例如：
 
@@ -232,7 +232,7 @@ Spring MVC框架主要解决了接收请求、响应结果的相关问题（其�
 </dependency>
 ```
 
-## 关于控制器
+## 62.3. 关于控制器
 
 在Spring MVC框架中，添加了`@Controller`注解的类，才算是控制器类！例如：
 
@@ -316,7 +316,7 @@ public @interface RestController {
 
 与此类似的还有`@RestControllerAdvice`，同时具有`@ControllerAdvice`和`@ResponseBody`的效果。
 
-## Spring MVC框架的相关注解
+## 62.4. Spring MVC框架的相关注解
 
 - `@RequestMapping`：可以添加在控制器类上，也可以添加在处理请求的方法上，主要用于配置请求路径，还可以配置其它与请求相关的设置，例如通过此注解的`method`属性来限制请求方式
 - `@PostMapping`：添加在处理请求的方法上，主要用于配置请求路径，及其它与请求相关的参数，是将请求方式限制为`POST`的`@RequestMapping`
@@ -332,9 +332,9 @@ public @interface RestController {
 - `@ControllerAdvice`：添加在某个类上，则此类中特定的方法（例如处理异常的方法）将作用于整个项目每次处理请求的过程中
 - `@RestControllerAdvice`：参考前节说明
 
-# Spring Boot
+# 63. 关于Spring Boot框架
 
-## Spring Boot框架的作用
+## 63.1. Spring Boot框架的作用
 
 Spring Boot框架主要解决了依赖管理、自动配置的相关问题。
 
@@ -342,7 +342,7 @@ Spring Boot框架主要解决了依赖管理、自动配置的相关问题。
 
 在没有Spring Boot框架之前，每创建一个新的项目，或添加新的依赖，可能都需要做大量的配置，而各个不同的项目中，使用相同的依赖时，需要编写的配置可能是高度相似，甚至完全相同的！Spring Boot希望它是“**开箱即用**的（Out Of Box）”，它自动的处理掉了许多可预测的配置，同时，它是希望遵循“**约定大于配置**”的思想的，即：各开发者不必关心Spring Boot是如何配置的，只需要知道Spring Boot把哪些配置项配置成什么值即可，然后，开发者只需要按照这些配置值的“约定”去写代码就行！例如，Spring Boot将组件扫描的包配置为启用类所在的包，开发者只需要将各组件类声明在此包或其子孙包下即可，根本不需要关心Spring Boot在哪里或通过什么方式配置了组件扫描！
 
-## Spring Boot框架的依赖项
+## 63.2. Spring Boot框架的依赖项
 
 当在项目中需要使用Spring Boot框架时，需要添加`spring-boot-starter`基础依赖项，例如：
 
@@ -355,7 +355,7 @@ Spring Boot框架主要解决了依赖管理、自动配置的相关问题。
 </dependency>
 ```
 
-## Spring Boot的典型特征
+## 63.3. Spring Boot的典型特征
 
 - 任何以`spring-boot-starter`作为前缀的依赖项（例如`spring-boot-starter-test`、`spring-boot-starter-web`等），都使用`spring-boot-starter`作为基础依赖项
 - 在`spring-boot-starter`中，包含了SLF4j日志框架的依赖项，所以，任何一个Spring Boot项目，都可以直接使用SLF4j日志框架

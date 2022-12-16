@@ -1,4 +1,6 @@
-## 关于密码加密
+# 64. 关于Spring Security框架（续）
+
+## 64.11. 关于密码加密
 
 由于目前已经配置了`PasswordEncoder`，具体类型是`BcryptPasswordEncoder`，则Spring Security在处理认证时，会自动使用它，就要求所有的被查询出来的密码都是密文，所以，在添加管理员时，密码也需要使用这种编码进行处理成密文再保存到数据库！
 
@@ -20,7 +22,7 @@ admin.setPassword(encodedPassword);
 
 完成后，可以通过`AdminServiceTests`测试检验效果（不要通过在线API文档去访问）。
 
-## 关于处理异常
+## 64.12. 关于处理异常
 
 在处理登录时，是由Spring Security处理的，当登录失败时，会由Spring Security抛出异常，所以，可以统一处理，对于用户名错误、密码错误这种的处理方式可以是完全相同的，但，原本的异常类型并不相同，用户名不存在时抛出的是`InternalAuthenticationServiceException`，密码错误时抛出的是`BadCredentialsException`。
 
@@ -68,7 +70,7 @@ public JsonResult handleThrowable(Throwable e) {
 
 **注意：**以上代码中的`e.printStackTrace();`是耗时操作，可能导致线程阻塞，在许多项目中是禁止使用的，在项目上线之前，应该评估是否需要删除此行代码！
 
-## 关于Spring Security判断是否通过认证的标准
+## 64.13. 关于Spring Security判断是否通过认证的标准
 
 在Spring Security框架中，有`SecurityContext`，它是用于持有各用户的认证信息的，即各用户成功登录后，需要将认证信息存入到`SecurityContext`中，后续，Spring Security框架会自动检查`SecurityContext`中的认证信息，如果某个用户在`SecurityContext`中没有匹配的认证信息，将被视为“未通过认证”（未登录）的状态。
 
@@ -102,11 +104,11 @@ public void login(AdminLoginDTO adminLoginDTO) {
 }
 ```
 
-## 关于管理员（用户）的权限设计
+## 64.14. 关于管理员（用户）的权限设计
 
 当前项目中，权限使用了 RBAC 的设计原则，具体可参考《CoolShark商城数据库与数据表设计(v1.0)-03.后台管理员管理相关数据表设计.pdf》。
 
-## 实现访问控制
+## 64.15. 实现访问控制
 
 在`csmall_ams.sql`脚本插入中的测试数据中，已经给出了权限、角色、管理员及相关的关联测试数据，也就是说，各管理员账号都有关联的角色，各角色也有关联的权限！
 
@@ -255,11 +257,11 @@ public JsonResult handleAccessDeniedException(AccessDeniedException e) {
 
 完成后，启用项目，在数据表中的数据都是初始测试数据的情况下，使用`root`账号登录，可以删除管理员，使用其它账号登录，将因为权限不足而无法执行删除管理员操作。
 
-## 认证处理流程
+## 64.16. 认证处理流程
 
 ![image-20221214163344258](images/image-20221214163344258.png)
 
-## 识别当前登录的账号
+## 64.17. 识别当前登录的账号
 
 在认证信息（`Authentication`）中包含`Principal`属性，目前，此属性就是`UserDetailsServiceImpl`返回的`UserDetails`对象。
 
@@ -288,7 +290,7 @@ public JsonResult delete(@PathVariable Long id,
 
 **注意：**当处理请求的方法添加了新的参数后，API文档默认视为此参数是由客户端提交的，实际上此参数是由Spring Security框架注入值的，所以，为了避免API文档错误显示，应该在此参数上补充添加`@ApiIgnore`注解，例如声明为`@ApiIgnore @AuthenticationPrincipal UserDetails userDetails`。
 
-## 登录信息中应该包括id或其它扩展信息
+## 64.18. 登录信息中应该包括id或其它扩展信息
 
 **提示：**在认证信息（`Authentication`）中包含`Principal`属性，目前，此属性就是`UserDetailsServiceImpl`返回的`UserDetails`对象。
 

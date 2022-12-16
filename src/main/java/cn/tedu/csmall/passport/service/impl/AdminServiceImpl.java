@@ -12,6 +12,7 @@ import cn.tedu.csmall.passport.pojo.vo.AdminStandardVO;
 import cn.tedu.csmall.passport.security.AdminDetails;
 import cn.tedu.csmall.passport.service.IAdminService;
 import cn.tedu.csmall.passport.web.ServiceCode;
+import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +69,11 @@ public class AdminServiceImpl implements IAdminService {
         Long id = adminDetails.getId();
         String username = adminDetails.getUsername();
         Collection<GrantedAuthority> authorities = adminDetails.getAuthorities();
+        String authoritiesJsonString = JSON.toJSONString(authorities);
+        log.debug("认证结果中的当事人ID：{}", id);
+        log.debug("认证结果中的当事人username：{}", username);
+        log.debug("认证结果中的当事人authorities：{}", authorities);
+        log.debug("认证结果中的当事人authoritiesJsonString：{}", authoritiesJsonString);
 
         // 将认证通过后得到的认证信息存入到SecurityContext中
         // 【注意】注释以下2行代码后，在未完成JWT验证流程之前，用户的登录将不可用
@@ -83,7 +89,7 @@ public class AdminServiceImpl implements IAdminService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", id);
         claims.put("username", username);
-        claims.put("authorities", authorities);
+        claims.put("authorities", authoritiesJsonString);
         String jwt = Jwts.builder() // 获取JwtBuilder，准备构建JWT数据
                 // 【1】Header：主要配置alg（algorithm：算法）和typ（type：类型）属性
                 .setHeaderParam("alg", "HS256")

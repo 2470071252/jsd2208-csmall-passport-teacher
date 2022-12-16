@@ -4,9 +4,7 @@ import cn.tedu.csmall.passport.security.LoginPrincipal;
 import cn.tedu.csmall.passport.web.JsonResult;
 import cn.tedu.csmall.passport.web.ServiceCode;
 import com.alibaba.fastjson.JSON;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -69,6 +67,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
+        // 设置响应的文档类型，用于处理异常时
+        response.setContentType("application/json;charset=utf-8");
+
         // 尝试解析JWT
         log.debug("获取到的JWT被视为有效，准备解析JWT……");
         String secretKey = "fdsFOj4tp9Dgvfd9t45rDkFSLKgfR8ou";
@@ -80,11 +81,26 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     .getBody();
         } catch (ExpiredJwtException e) {
             String message = "您的登录信息已过期，请重新登录！";
+            log.warn("解析JWT时出现ExpiredJwtException，响应的消息：{}", message);
             JsonResult jsonResult = JsonResult.fail(ServiceCode.ERR_JWT_EXPIRED, message);
-            response.setContentType("application/json;charset=utf-8");
             PrintWriter writer = response.getWriter();
             writer.println(JSON.toJSONString(jsonResult));
-            writer.flush();
+            writer.close();
+            return;
+        } catch (SignatureException e) {
+            String message = "非法访问！";
+            log.warn("解析JWT时出现SignatureException，响应的消息：{}", message);
+            JsonResult jsonResult = JsonResult.fail(ServiceCode.ERR_JWT_SIGNATURE, message);
+            PrintWriter writer = response.getWriter();
+            writer.println(JSON.toJSONString(jsonResult));
+            writer.close();
+            return;
+        } catch (MalformedJwtException e) {
+            String message = "非法访问！";
+            log.warn("解析JWT时出现MalformedJwtException，响应的消息：{}", message);
+            JsonResult jsonResult = JsonResult.fail(ServiceCode.ERR_JWT_MALFORMED, message);
+            PrintWriter writer = response.getWriter();
+            writer.println(JSON.toJSONString(jsonResult));
             writer.close();
             return;
         }

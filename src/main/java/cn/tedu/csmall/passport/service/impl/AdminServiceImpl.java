@@ -257,7 +257,12 @@ public class AdminServiceImpl implements IAdminService {
         admin.setId(id);
         admin.setEnable(enable);
         log.debug("即将修改数据，参数：{}", admin);
-        adminMapper.update(admin);
+        int rows = adminMapper.update(admin);
+        if (rows != 1) {
+            String message = enableText[enable] + "管理员失败，服务器忙，请稍后再次尝试！";
+            log.warn(message);
+            throw new ServiceException(ServiceCode.ERR_UPDATE, message);
+        }
     }
 
 }

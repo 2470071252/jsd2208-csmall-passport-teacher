@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -26,6 +27,13 @@ public class RoleServiceImpl implements IRoleService {
     public List<RoleListItemVO> list() {
         log.debug("开始处理【查询角色列表】的业务，无参数");
         List<RoleListItemVO> list = roleMapper.list();
+        Iterator<RoleListItemVO> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            RoleListItemVO roleListItemVO = iterator.next();
+            if (roleListItemVO.getId() == 1) {
+                iterator.remove();
+            }
+        }
         return list;
     }
 

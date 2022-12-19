@@ -3,7 +3,6 @@ package cn.tedu.csmall.passport.controller;
 import cn.tedu.csmall.passport.pojo.dto.AdminAddNewDTO;
 import cn.tedu.csmall.passport.pojo.dto.AdminLoginDTO;
 import cn.tedu.csmall.passport.pojo.vo.AdminListItemVO;
-import cn.tedu.csmall.passport.security.AdminDetails;
 import cn.tedu.csmall.passport.security.LoginPrincipal;
 import cn.tedu.csmall.passport.service.IAdminService;
 import cn.tedu.csmall.passport.web.JsonResult;

@@ -57,10 +57,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/v2/api-docs"
         };
 
+        // 启用Security框架自带的CorsFilter过滤器，可以对OPTIONS请求放行
+        http.cors();
+
         // 配置请求是否需要认证
         http.authorizeRequests() // 配置请求的认证授权
-                .mvcMatchers(HttpMethod.OPTIONS, "/**")
-                .permitAll()
+                // .mvcMatchers(HttpMethod.OPTIONS, "/**")
+                // .permitAll()
                 .mvcMatchers(urls) // 匹配某些请求路径
                 .permitAll() // 允许直接访问，即不需要通过认证
                 .anyRequest() // 其它任何请求

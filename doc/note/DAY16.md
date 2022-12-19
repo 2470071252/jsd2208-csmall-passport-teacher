@@ -468,19 +468,11 @@ http.authorizeRequests()
         .authenticated();
 ```
 
+或者，在此配置类中，调用参数对象的`cors()`方法，启用Security框架自带的CorsFilter过滤器，可以对OPTIONS请求放行，也可以解决此问题：
 
+```java
+// 启用Security框架自带的CorsFilter过滤器，可以对OPTIONS请求放行
+http.cors();
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+提示：对于复杂请求会先发起`OPTIONS`请求进行预检，这是浏览器自主的行为，当浏览器对某个URL的预检请求被通过后，浏览器会将此状态缓存下来，后续，对此URL的请求不会再执行预检！

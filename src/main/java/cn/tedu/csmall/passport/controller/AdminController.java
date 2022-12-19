@@ -28,7 +28,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/admins")
-@Api(tags = "管理员管理模块")
+@Api(tags = "1. 管理员管理模块")
 public class AdminController {
 
     @Autowired
